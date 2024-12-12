@@ -7,20 +7,53 @@ class HistoryModal extends StatefulWidget {
   HistoryCreate historyCreate;
 
   HistoryModal({HistoryCreate? historyCreate})
-      : this.historyCreate = historyCreate ?? HistoryCreate();
+      : this.historyCreate = historyCreate ?? new HistoryCreate();
 
   @override
   State<HistoryModal> createState() => _HistoryModalState();
 }
 
 class _HistoryModalState extends State<HistoryModal> {
-  late TextEditingController _titleController = new TextEditingController();
-  late TextEditingController _descriptionController =
-      new TextEditingController();
-  int selectedYear = DateTime.now().year;
-  int selectedMonth = DateTime.now().month;
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  int startYear = DateTime.now().year;
+  int startMonth = DateTime.now().month;
+  int endYear = DateTime.now().year;
+  int endMonth = DateTime.now().month;
+  bool startCheck = false;
+  bool endCheck = false;
   bool _currentProgress = false;
   bool enabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.historyCreate.startDt != "" ? startCheck = true : startCheck = false;
+    widget.historyCreate.endDt != "" ? endCheck = true : endCheck = false;
+    _titleController =
+        TextEditingController(text: widget.historyCreate.title ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.historyCreate.description ?? '');
+    _titleController.addListener(_updateButtonState);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      // 모든 TextField가 입력되었는지 확인
+      if (_currentProgress) {
+        enabled = _titleController.text.isNotEmpty && startCheck;
+      } else {
+        enabled = _titleController.text.isNotEmpty && startCheck && endCheck;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +123,7 @@ class _HistoryModalState extends State<HistoryModal> {
                   onTap: () {
                     setState(() {
                       _currentProgress = !_currentProgress;
+                      _updateButtonState();
                     });
                   },
                   child: Row(
@@ -125,7 +159,7 @@ class _HistoryModalState extends State<HistoryModal> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        _showDatePicker();
+                        _startDatePicker();
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width / 3,
@@ -140,29 +174,36 @@ class _HistoryModalState extends State<HistoryModal> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
                           child: Text(
-                            selectedYear != 0
-                                ? "$selectedYear-${selectedMonth.toString().padLeft(2, '0')}"
+                            startCheck
+                                ? "$startYear-${startMonth.toString().padLeft(2, '0')}"
                                 : "시작일",
                             style: TextStyle(color: mainGrey, fontSize: 16),
                           ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width / 3,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: lightGrey, // 선의 색상
-                            width: 1.0, // 선의 두께
+                    GestureDetector(
+                      onTap: () {
+                        _endDatePicker();
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 3,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: lightGrey, // 선의 색상
+                              width: 1.0, // 선의 두께
+                            ),
                           ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          '종료일',
-                          style: TextStyle(color: mainGrey, fontSize: 16),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Text(
+                            endCheck
+                                ? "$endYear-${endMonth.toString().padLeft(2, '0')}"
+                                : "종료일",
+                            style: TextStyle(color: mainGrey, fontSize: 16),
+                          ),
                         ),
                       ),
                     ),
@@ -213,7 +254,13 @@ class _HistoryModalState extends State<HistoryModal> {
                   height: 16,
                 ),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    widget.historyCreate.title=_titleController.text;
+                    widget.historyCreate.description=_descriptionController.text;
+                    widget.historyCreate.startDt = "${startYear}${startMonth.toString().padLeft(2, '0')}";
+                    widget.historyCreate.endDt= "${endYear}${endMonth.toString().padLeft(2, '0')}";
+                    Navigator.pop(context, widget.historyCreate);
+                  },
                   child: Text(
                     '저장',
                     style: TextStyle(
@@ -238,7 +285,7 @@ class _HistoryModalState extends State<HistoryModal> {
     );
   }
 
-  void _showDatePicker() {
+  void _startDatePicker() {
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
@@ -268,11 +315,13 @@ class _HistoryModalState extends State<HistoryModal> {
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
-                          initialItem: selectedYear - 2000),
+                          initialItem: startYear - 2000),
                       itemExtent: 32.0,
                       onSelectedItemChanged: (int index) {
                         setState(() {
-                          selectedYear = 2000 + index;
+                          startYear = 2000 + index;
+                          startCheck = true;
+                          _updateButtonState();
                         });
                       },
                       children: List<Widget>.generate(
@@ -287,11 +336,90 @@ class _HistoryModalState extends State<HistoryModal> {
                   Expanded(
                     child: CupertinoPicker(
                       scrollController: FixedExtentScrollController(
-                          initialItem: selectedMonth - 1),
+                          initialItem: startMonth - 1),
                       itemExtent: 32.0,
                       onSelectedItemChanged: (int index) {
                         setState(() {
-                          selectedMonth = index + 1;
+                          startMonth = index + 1;
+                          startCheck = true;
+                          _updateButtonState();
+                        });
+                      },
+                      children: List<Widget>.generate(
+                        12,
+                        (int index) => Center(
+                          child: Text('${index + 1}월'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _endDatePicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        height: 300,
+        color: Colors.white,
+        child: Column(
+          children: [
+            // Done 버튼
+            Container(
+              color: Colors.grey[200],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                    child: Text("Done"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  // Year Picker
+                  Expanded(
+                    child: CupertinoPicker(
+                      scrollController: FixedExtentScrollController(
+                          initialItem: endYear - 2000),
+                      itemExtent: 32.0,
+                      onSelectedItemChanged: (int index) {
+                        setState(() {
+                          endYear = 2000 + index;
+                          endCheck = true;
+                          _updateButtonState();
+                        });
+                      },
+                      children: List<Widget>.generate(
+                        100,
+                        (int index) => Center(
+                          child: Text('${2000 + index}'),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Month Picker
+                  Expanded(
+                    child: CupertinoPicker(
+                      scrollController: FixedExtentScrollController(
+                          initialItem: endMonth - 1),
+                      itemExtent: 32.0,
+                      onSelectedItemChanged: (int index) {
+                        setState(() {
+                          endMonth = index + 1;
+                          endCheck = true;
+                          _updateButtonState();
                         });
                       },
                       children: List<Widget>.generate(

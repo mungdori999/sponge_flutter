@@ -109,8 +109,9 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                       style: TextStyle(color: mainGrey, fontSize: 16),
                     ),
                     IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
+                      onPressed: () async {
+                        final HistoryCreate history =
+                            await showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.white,
                           isScrollControlled: true,
@@ -119,9 +120,20 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                                 BorderRadius.vertical(top: Radius.circular(20)),
                           ),
                           builder: (context) {
-                            return HistoryModal();
+                            return GestureDetector(
+                              onTap: () {
+                                FocusScope.of(context).unfocus(); // 키보드 닫기
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: HistoryModal(),
+                            );
                           },
                         );
+                        setState(() {
+                          if (history.title != '') {
+                            widget.historyList.add(history);
+                          }
+                        });
                       },
                       icon: Container(
                         width: 24,
@@ -141,10 +153,61 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                 ),
               ),
             ),
+            Column(
+              children: widget.historyList.map((history) {
+                return Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.symmetric(vertical: 8), // 컨테이너 간격
+                  padding: EdgeInsets.all(12), // 내부 여백
+                  decoration: BoxDecoration(
+                    border: Border.all(color: mainYellow, width: 1),
+                    // 노란색 실선
+                    borderRadius: BorderRadius.circular(12), // 모서리 둥글게
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 왼쪽 정렬
+                    children: [
+                      Text(
+                        history.title ?? 'No Title',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: darkGrey,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          // TODO 현재진행중이라면 endDt가 없음
+                          Text(formatDateString(history.startDt),style: TextStyle(color: mainGrey,fontSize: 16,fontWeight: FontWeight.w700),),
+                          Text('~'),
+                          Text(formatDateString(history.endDt),style: TextStyle(color: mainGrey,fontSize: 16,fontWeight: FontWeight.w700),),
+                        ],
+                      ),
+                      Text(
+                        history.description ?? 'No Description',
+                        // history의 description
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: mainGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String formatDateString(String date) {
+    if (date.length != 6) return date; // 길이가 6이 아니면 그대로 반환
+    String year = date.substring(0, 4); // 앞의 4자리: 연도
+    String month = date.substring(4, 6); // 뒤의 2자리: 월
+    return "$year.$month";
   }
 }
 
@@ -161,3 +224,4 @@ class _RequiredStar extends StatelessWidget {
     );
   }
 }
+
