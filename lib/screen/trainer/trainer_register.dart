@@ -4,6 +4,7 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 import 'package:sponge_app/http/auth_response.dart';
+import 'package:sponge_app/screen/trainer/address_profile.dart';
 import 'package:sponge_app/screen/trainer/history_profile.dart';
 import 'package:sponge_app/screen/trainer/trainer_profile.dart';
 
@@ -18,6 +19,15 @@ class TrainerRegister extends StatefulWidget {
 
 class _TrainerRegisterState extends State<TrainerRegister> {
   TrainerCreate trainerCreate = new TrainerCreate();
+  bool _enabled = false;
+
+  _updateButton() {
+    setState(() {
+      _enabled = trainerCreate.name != '' &&
+          trainerCreate.phone != '' &&
+          trainerCreate.years != 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +36,29 @@ class _TrainerRegisterState extends State<TrainerRegister> {
         title: const WriteTop(),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: OutlinedButton(
+            onPressed: _enabled ? () {} : null,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: _enabled ? mainYellow : lightGrey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              side: BorderSide.none,
+              minimumSize: Size(double.infinity, 48),
+            ),
+            child: Text(
+              '다음',
+              style: TextStyle(
+                color: _enabled ? Colors.white : mainGrey,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -132,6 +165,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                           );
                           setState(() {
                             this.trainerCreate = trainerCreate;
+                            _updateButton();
                           });
                         },
                         icon: Icon(
@@ -211,6 +245,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                             );
                             setState(() {
                               trainerCreate.years = years;
+                              _updateButton();
                             });
                           },
                           icon: Icon(
@@ -259,6 +294,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                                 );
                                 setState(() {
                                   trainerCreate.years = years;
+                                  _updateButton();
                                 });
                               },
                               icon: Icon(
@@ -284,7 +320,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                           // 내부 여백
                           decoration: BoxDecoration(
                             color: lightGrey,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                           child: Row(
                             children: [
@@ -380,10 +416,20 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                         '지역을 선택해주세요',
                         style: TextStyle(color: mainGrey, fontSize: 16),
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: mainGrey,
-                        size: 30,
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddressProfile(),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color: mainGrey,
+                          size: 30,
+                        ),
                       ),
                     ],
                   ),
