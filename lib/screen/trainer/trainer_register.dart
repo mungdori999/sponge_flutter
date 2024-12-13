@@ -177,15 +177,19 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                       style: TextStyle(color: mainGrey, fontSize: 16),
                     ),
                     IconButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        int years = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => HistoryRegister(
                               historyList: trainerCreate.historyList,
+                              years: trainerCreate.years,
                             ),
                           ),
                         );
+                        setState(() {
+                        trainerCreate.years = years;
+                        });
                       },
                       icon: Icon(
                         Icons.chevron_right,

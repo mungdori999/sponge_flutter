@@ -255,10 +255,15 @@ class _HistoryModalState extends State<HistoryModal> {
                 ),
                 OutlinedButton(
                   onPressed: () {
-                    widget.historyCreate.title=_titleController.text;
-                    widget.historyCreate.description=_descriptionController.text;
-                    widget.historyCreate.startDt = "${startYear}${startMonth.toString().padLeft(2, '0')}";
-                    widget.historyCreate.endDt= "${endYear}${endMonth.toString().padLeft(2, '0')}";
+                    widget.historyCreate.title = _titleController.text;
+                    widget.historyCreate.description =
+                        _descriptionController.text;
+                    widget.historyCreate.startDt =
+                        "${startYear}${startMonth.toString().padLeft(2, '0')}";
+                    if (!_currentProgress) {
+                      widget.historyCreate.endDt =
+                          "${endYear}${endMonth.toString().padLeft(2, '0')}";
+                    }
                     Navigator.pop(context, widget.historyCreate);
                   },
                   child: Text(
