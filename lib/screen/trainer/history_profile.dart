@@ -86,7 +86,7 @@ class _HistoryRegisterState extends State<HistoryRegister> {
               Row(
                 children: [
                   Text(
-                    '연차',
+                    '년차',
                     style: TextStyle(
                         color: mediumGrey,
                         fontWeight: FontWeight.w700,
@@ -99,7 +99,7 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    '~${_currentValue.toInt()}연차',
+                    '~${_currentValue.toInt()}년차',
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                   ),
                   Slider(
@@ -256,7 +256,7 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                               Row(
                                 children: [
                                   Text(
-                                    formatDateString(history.startDt),
+                                    _formatDateString(history.startDt),
                                     style: TextStyle(
                                         color: mainGrey,
                                         fontSize: 14,
@@ -271,7 +271,7 @@ class _HistoryRegisterState extends State<HistoryRegister> {
                                   ),
                                   if (history.endDt != '')
                                     Text(
-                                      formatDateString(history.endDt),
+                                      _formatDateString(history.endDt),
                                       style: TextStyle(
                                           color: mainGrey,
                                           fontSize: 14,
@@ -312,7 +312,7 @@ class _HistoryRegisterState extends State<HistoryRegister> {
     );
   }
 
-  String formatDateString(String date) {
+  String _formatDateString(String date) {
     if (date.length != 6) return date; // 길이가 6이 아니면 그대로 반환
     String year = date.substring(0, 4); // 앞의 4자리: 연도
     String month = date.substring(4, 6); // 뒤의 2자리: 월
