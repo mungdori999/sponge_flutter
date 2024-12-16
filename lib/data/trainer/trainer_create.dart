@@ -5,7 +5,7 @@ class TrainerCreate {
   int years;
   String profileImgUrl;
   List<HistoryCreate> historyList = [];
-  List<AddressCreate> addressList=[];
+  List<AddressCreate> addressList = [];
 
   TrainerCreate(
       {this.name = '',
@@ -20,6 +20,10 @@ class AddressCreate {
   String town;
 
   AddressCreate({required this.city, required this.town});
+
+  AddressCreate copy() {
+    return AddressCreate(city: this.city, town: this.town);
+  }
 }
 
 class HistoryCreate {

@@ -412,18 +412,37 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '지역을 선택해주세요',
-                        style: TextStyle(color: mainGrey, fontSize: 16),
-                      ),
+                      if (trainerCreate.addressList.length == 0) ...[
+                        Text(
+                          '지역을 선택해주세요',
+                          style: TextStyle(color: mainGrey, fontSize: 16),
+                        ),
+                      ] else ...[
+                        Row(
+                          children: [
+                            ...trainerCreate.addressList.map((address) {
+                              return Text(
+                                '${address.city} ${address.town}',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w700),
+                              );
+                            }),
+                          ],
+                        ),
+                      ],
                       IconButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddressProfile(),
+                              builder: (context) => AddressProfile(
+                                addressList: trainerCreate.addressList,
+                              ),
                             ),
                           );
+                          setState(() {
+
+                          });
                         },
                         icon: Icon(
                           Icons.chevron_right,

@@ -6,18 +6,26 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 
 class AddressProfile extends StatefulWidget {
-  AddressProfile({super.key});
+  final List<AddressCreate> addressList;
+
+  AddressProfile({super.key, required this.addressList});
 
   @override
   State<AddressProfile> createState() => _AddressProfileState();
 }
 
 class _AddressProfileState extends State<AddressProfile> {
-  String city = '';
-  String town = '';
+  String selectedCity = '';
   List<String> townList = [];
   List<String> cityList = City.values.map((city) => city.address).toList();
   List<AddressCreate> addressList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    this.addressList =
+        widget.addressList.map((address) => address.copy()).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +42,38 @@ class _AddressProfileState extends State<AddressProfile> {
             color: Colors.black, // 아이콘 색상
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: OutlinedButton(
+            onPressed: () {
+              widget.addressList.clear();
+              widget.addressList.addAll(addressList.map((address)=>address.copy()).toList());
+              Navigator.pop(context);
+            },
+            style: OutlinedButton.styleFrom(
+              backgroundColor: mainYellow,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              side: BorderSide.none,
+              minimumSize: Size(double.infinity, 48),
+            ),
+            child: Text(
+              '저장',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -83,25 +118,24 @@ class _AddressProfileState extends State<AddressProfile> {
                             List<String> lowestAdmCodeNmList = await _getTown(
                                 admCode: City.getCodeByAddress(city));
                             setState(() {
-                              this.city = city;
+                              this.selectedCity = city;
                               this.townList = lowestAdmCodeNmList;
                             });
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 4),
-                            // 아이템 간격
                             padding: EdgeInsets.symmetric(horizontal: 20),
-                            // 내용 여백
                             decoration: BoxDecoration(
-                              color: this.city == city ? mainYellow : lightGrey,
-                              // 배경색 (회색)
+                              color: this.selectedCity == city
+                                  ? mainYellow
+                                  : lightGrey,
                               borderRadius: BorderRadius.circular(8), // 둥근 모서리
                             ),
                             child: Center(
                               child: Text(
                                 city, // 텍스트 (도시 이름)
                                 style: TextStyle(
-                                  color: this.city == city
+                                  color: this.selectedCity == city
                                       ? Colors.white
                                       : mainGrey,
                                   fontSize: 16,
@@ -117,40 +151,53 @@ class _AddressProfileState extends State<AddressProfile> {
               SizedBox(
                 height: 16,
               ),
-              Row(
-                children: [
-                  ...addressList.map((address) {
-                    return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 4), // 수평 패딩만 설정하여 위아래 패딩 없앰
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: mainYellow, // 테두리 색상
-                          width: 1, // 테두리 두께
+              Container(
+                height: 30,
+                child: ListView(
+                  physics: PageScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    ...addressList.map((address) {
+                      return Container(
+                        margin: EdgeInsets.only(right: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: mainYellow, // 테두리 색상
+                            width: 1, // 테두리 두께
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${address.city} > ${address.town}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: mainYellow, // 텍스트 색상
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${address.city} > ${address.town}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: mainYellow, // 텍스트 색상
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {},
-                            iconSize: 20,
-                            icon: Icon(Icons.cancel), // X 아이콘
-                            padding: EdgeInsets.zero,  // 기본 패딩 제거
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ],
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  addressList.remove(address);
+                                });
+                              },
+                              child: Icon(
+                                Icons.close,
+                                color: mainYellow,
+                                size: 18,
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
               Column(
                 children: [
@@ -158,9 +205,8 @@ class _AddressProfileState extends State<AddressProfile> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          this.town = town;
-                          addressList.add(
-                              new AddressCreate(city: city, town: this.town));
+                          addressList.add(new AddressCreate(
+                              city: selectedCity, town: town));
                         });
                       },
                       child: Container(
@@ -178,8 +224,15 @@ class _AddressProfileState extends State<AddressProfile> {
                           child: Text(
                             town,
                             style: TextStyle(
-                                color:
-                                    this.town == town ? mainYellow : mainGrey,
+                                color: addressList.any(
+                                          (address) =>
+                                              address.city == this.selectedCity,
+                                        ) &&
+                                        addressList.any(
+                                          (address) => address.town == town,
+                                        )
+                                    ? mainYellow
+                                    : mainGrey,
                                 fontSize: 16),
                           ),
                         ), // town 값을 Text로 표시
@@ -199,7 +252,6 @@ class _AddressProfileState extends State<AddressProfile> {
     final String apiUrl = 'https://api.vworld.kr/ned/data/admSiList'; // 기본 URL
     await dotenv.load(fileName: 'asset/config/.env');
     String? digitalApiKey = dotenv.env['DIGITAL_API_KEY'];
-    print(digitalApiKey);
     Dio dio = Dio();
     try {
       // 쿼리 파라미터 동적 처리
