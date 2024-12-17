@@ -1,4 +1,5 @@
 class TrainerCreate {
+  String email;
   String name;
   String phone;
   int gender;
@@ -9,6 +10,7 @@ class TrainerCreate {
   List<AddressCreate> addressList = [];
 
   TrainerCreate({
+    this.email = '',
     this.name = '',
     this.phone = '',
     this.gender = 1,
@@ -20,6 +22,7 @@ class TrainerCreate {
   // toJson 메소드 추가
   Map<String, dynamic> toJson() {
     return {
+      'email':email,
       'name': name,
       'phone': phone,
       'gender': gender,
@@ -27,7 +30,7 @@ class TrainerCreate {
       'profileImgUrl': profileImgUrl,
       'content': content,
       'historyList': historyList.map((history) => history.toJson()).toList(),
-      'addressList': addressList.map((address) => address.toJson()).toList(),
+      'trainerAddressList': addressList.map((address) => address.toJson()).toList(),
     };
   }
 }

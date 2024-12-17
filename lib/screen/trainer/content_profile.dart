@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
+import 'package:sponge_app/screen/trainer/trainer_success.dart';
 
 class ContentProfile extends StatefulWidget {
   TrainerCreate trainerCreate;
@@ -49,6 +50,12 @@ class _ContentProfileState extends State<ContentProfile> {
               onPressed: () async{
                 widget.trainerCreate.content = _contentController.text;
                 await createTrainer(widget.trainerCreate);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrainerSuccess(),
+                  ),
+                );
               },
               style: OutlinedButton.styleFrom(
                 backgroundColor: mainYellow,

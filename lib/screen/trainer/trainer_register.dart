@@ -32,6 +32,13 @@ class _TrainerRegisterState extends State<TrainerRegister> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    trainerCreate.email = widget.authResponse.email;
+    trainerCreate.name = widget.authResponse.name;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +55,9 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ContentProfile(trainerCreate: trainerCreate,),
+                        builder: (context) => ContentProfile(
+                          trainerCreate: trainerCreate,
+                        ),
                       ),
                     );
                   }
