@@ -5,6 +5,7 @@ import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 import 'package:sponge_app/http/auth_response.dart';
 import 'package:sponge_app/screen/trainer/address_profile.dart';
+import 'package:sponge_app/screen/trainer/content_profile.dart';
 import 'package:sponge_app/screen/trainer/history_profile.dart';
 import 'package:sponge_app/screen/trainer/trainer_profile.dart';
 
@@ -25,7 +26,8 @@ class _TrainerRegisterState extends State<TrainerRegister> {
     setState(() {
       _enabled = trainerCreate.name != '' &&
           trainerCreate.phone != '' &&
-          trainerCreate.years != 0;
+          trainerCreate.years != 0 &&
+          trainerCreate.addressList.length > 0;
     });
   }
 
@@ -41,7 +43,16 @@ class _TrainerRegisterState extends State<TrainerRegister> {
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OutlinedButton(
-            onPressed: _enabled ? () {} : null,
+            onPressed: _enabled
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContentProfile(trainerCreate: trainerCreate,),
+                      ),
+                    );
+                  }
+                : null,
             style: OutlinedButton.styleFrom(
               backgroundColor: _enabled ? mainYellow : lightGrey,
               shape: RoundedRectangleBorder(
@@ -420,13 +431,31 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                       ] else ...[
                         Row(
                           children: [
-                            ...trainerCreate.addressList.map((address) {
-                              return Text(
-                                '${address.city} ${address.town}',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w700),
+                            ...trainerCreate.addressList.take(3).map((address) {
+                              // 처음 3개의 요소만 표시
+                              return Row(
+                                children: [
+                                  Text(
+                                    '${address.city} ${address.town}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  const SizedBox(width: 4), // 요소 간 간격
+                                ],
                               );
-                            }),
+                            }).toList(),
+                            if (trainerCreate.addressList.length > 3)
+                              Row(
+                                children: [
+                                  Text(
+                                    '...',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ],
@@ -441,7 +470,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                             ),
                           );
                           setState(() {
-
+                            _updateButton();
                           });
                         },
                         icon: Icon(

@@ -99,7 +99,6 @@ class _TrainerProfileState extends State<TrainerProfile> {
                 children: [
                   Stack(
                     children: [
-                      // 동그라미 컨테이너
                       Container(
                         width: 100, // 동그라미의 너비
                         height: 100, // 동그라미의 높이
