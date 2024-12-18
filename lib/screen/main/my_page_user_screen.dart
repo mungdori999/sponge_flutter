@@ -15,17 +15,17 @@ import 'package:sponge_app/request/user_request.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 
-class MyPageScreen extends StatefulWidget {
-  MyPageScreen({super.key});
+class MyPageUserScreen extends StatefulWidget {
+  final LoginAuth loginAuth;
+  MyPageUserScreen({super.key, required this.loginAuth});
 
   @override
-  State<MyPageScreen> createState() => _MyPageScreenState();
+  State<MyPageUserScreen> createState() => _MyPageUserScreenState();
 }
 
-class _MyPageScreenState extends State<MyPageScreen> {
+class _MyPageUserScreenState extends State<MyPageUserScreen> {
   JwtUtil jwtUtil = JwtUtil();
 
-  LoginAuth? loginAuth;
   UserResponse? user;
 
   List<Pet> petList = [];
@@ -50,33 +50,18 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Future<void> _initializeData() async {
-    try {
-      final auth = await jwtUtil.getJwtToken();
-      if (auth.id == 0) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertLogin();
-            },
-          );
-        });
-      } else {
         final myInfo = await getMyInfo();
         final myPet = await getMyPet();
         final myPost = await getMyPost(currentPage);
 
         setState(() {
-          loginAuth = auth;
           user = myInfo;
           petList = myPet;
           postList.addAll(myPost);
           currentPage++;
         });
-      }
-    } catch (e) {
-      print("Error initializing data: $e");
-    }
+
+
   }
 
   Future<void> _fetchMorePosts() async {
@@ -114,16 +99,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (loginAuth == null) {
-      // userAuth 초기화 전 로딩 화면 표시
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
