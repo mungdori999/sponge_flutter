@@ -1,7 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
-import 'package:sponge_app/screen/register_pet.dart';
+import 'package:sponge_app/screen/pet/register_pet.dart';
 
 class AddPet extends StatelessWidget {
   const AddPet({super.key});

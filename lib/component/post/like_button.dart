@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/request/post_request.dart';
 
 class LikeButton extends StatefulWidget {
   final int postId;
+  final String loginType;
   int likeCount;
   bool flag;
 
-  LikeButton({super.key, required this.postId, required this.likeCount,required this.flag});
+  LikeButton({super.key, required this.postId, required this.likeCount,required this.flag, required this.loginType});
 
   @override
   State<LikeButton> createState() => _LikeButtonState();
@@ -19,11 +21,34 @@ class _LikeButtonState extends State<LikeButton> {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () async {
-        await updateLike(widget.postId);
-        setState(() {
-          widget.flag ? widget.likeCount-- : widget.likeCount++;
-          widget.flag = !widget.flag;
-        });
+        if(widget.loginType == LoginType.USER.value) {
+          await updateLike(widget.postId);
+          setState(() {
+            widget.flag ? widget.likeCount-- : widget.likeCount++;
+            widget.flag = !widget.flag;
+          });
+        }
+        else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('주의'),
+                  content: Text('견주 로그인이 필요합니다.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('닫기'),
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+        }
       },
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(

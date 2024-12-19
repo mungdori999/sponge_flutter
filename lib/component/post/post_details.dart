@@ -14,8 +14,9 @@ class PostDetails extends StatelessWidget {
   final PostResponse post;
   final bool myPost;
   final CheckResponse check;
+  final String loginType;
 
-  const PostDetails({super.key, required this.post, required this.myPost, required this.check});
+  const PostDetails({super.key, required this.post, required this.myPost, required this.check, required this.loginType});
 
   @override
   Widget build(BuildContext context) {
@@ -219,6 +220,7 @@ class PostDetails extends StatelessWidget {
                     postId: post.id,
                     likeCount: post.likeCount,
                     flag: check.likeCheck,
+                    loginType: loginType,
                   ),
                   SizedBox(
                     width: 8,
@@ -226,6 +228,7 @@ class PostDetails extends StatelessWidget {
                   BookmarkButton(
                     postId: post.id,
                     flag: check.bookmarkCheck,
+                    loginType: loginType,
                   ),
                 ],
               ),

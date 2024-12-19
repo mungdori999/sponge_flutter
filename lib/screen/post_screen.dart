@@ -60,6 +60,7 @@ class _PostScreenState extends State<PostScreen> {
                   post: post,
                   myPost: userAuth.id == post.userId,
                   check: check,
+                  loginType: userAuth.loginType,
                 ),
                 SizedBox(
                   height: 24,

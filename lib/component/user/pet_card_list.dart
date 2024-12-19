@@ -3,7 +3,8 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/pet/pet.dart';
-import 'package:sponge_app/screen/register_pet.dart';
+import 'package:sponge_app/screen/pet/register_pet.dart';
+import 'package:sponge_app/screen/pet/update_pet.dart';
 
 class PetCardList extends StatefulWidget {
   final List<Pet> petList;
@@ -34,7 +35,7 @@ class _PetCardListState extends State<PetCardList> {
             controller: _controller,
             onPageChanged: (index) {
               setState(() {
-                _currentIndex = index; // 현재 인덱스 업데이트
+                _currentIndex = index;
               });
             },
             children: [
@@ -135,7 +136,32 @@ class _PetCardListState extends State<PetCardList> {
             ],
           ),
         ),
-        SizedBox(height: 16),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdatePet(pet: widget.petList[_currentIndex],),
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero, // 추가 여백 없애기
+                minimumSize: Size.zero,  // 최소 크기 설정
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 터치 영역 최소화
+              ),
+              child: Text(
+                '수정하기',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: mediumGrey,
+                ),
+              ),
+            ),
+          ],
+        ),
         if (widget.petList.length > 1)
           SmoothPageIndicator(
             controller: _controller, // PageController 연결

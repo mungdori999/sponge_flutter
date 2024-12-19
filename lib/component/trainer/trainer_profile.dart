@@ -172,6 +172,7 @@ class TrainerProfile extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(height: 8 ,),
         Card(
           color: Colors.white,
           child: Padding(
@@ -190,10 +191,10 @@ class TrainerProfile extends StatelessWidget {
                       children: [
                         Icon(Icons.star, color: mainYellow, size: 18),
                         Text(
-                          '0',
+                          '0.0',
                           style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w700),
                         ),
                       ],
                     )
@@ -210,7 +211,7 @@ class TrainerProfile extends StatelessWidget {
                       '${trainer.chatCount}건',
                       style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w500),
+                          fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -225,7 +226,7 @@ class TrainerProfile extends StatelessWidget {
                       '${trainer.adoptCount}건',
                       style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w500),
+                          fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),

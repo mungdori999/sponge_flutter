@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/request/post_request.dart';
 
 class BookmarkButton extends StatefulWidget {
   final int postId;
+  final String loginType;
   bool flag;
 
-  BookmarkButton({super.key, required this.postId,required this.flag});
+  BookmarkButton({super.key, required this.postId,required this.flag, required this.loginType});
 
   @override
   State<BookmarkButton> createState() => _BookmarkButtonState();
@@ -17,10 +19,33 @@ class _BookmarkButtonState extends State<BookmarkButton> {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () async {
+        if(widget.loginType == LoginType.USER.value) {
         await updateBookmark(widget.postId);
         setState(() {
           widget.flag = !widget.flag;
         });
+        }
+        else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('주의'),
+                  content: Text('견주 로그인이 필요합니다.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('닫기'),
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+        }
       },
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(

@@ -113,11 +113,6 @@ class _HomePostListState extends State<HomePostList> {
                     Provider.of<PageIndexProvider>(context,
                         listen: false)
                         .updateIndex(1);
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/',
-                          (Route<dynamic> route) => false,
-                    );
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: mainGrey, backgroundColor: Colors.white, // 텍스트 색상
