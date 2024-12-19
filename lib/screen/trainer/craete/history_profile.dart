@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
-import 'package:sponge_app/screen/trainer/history_modal.dart';
+import 'package:sponge_app/screen/trainer/craete/history_modal.dart';
 
 class HistoryRegister extends StatefulWidget {
   List<HistoryCreate> historyList;

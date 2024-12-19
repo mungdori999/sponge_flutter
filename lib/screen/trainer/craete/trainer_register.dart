@@ -4,10 +4,10 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 import 'package:sponge_app/http/auth_response.dart';
-import 'package:sponge_app/screen/trainer/address_profile.dart';
-import 'package:sponge_app/screen/trainer/content_profile.dart';
-import 'package:sponge_app/screen/trainer/history_profile.dart';
-import 'package:sponge_app/screen/trainer/trainer_profile.dart';
+import 'package:sponge_app/screen/trainer/craete/address_profile.dart';
+import 'package:sponge_app/screen/trainer/craete/content_profile.dart';
+import 'package:sponge_app/screen/trainer/craete/history_profile.dart';
+import 'package:sponge_app/screen/trainer/craete/trainer_profile.dart';
 
 class TrainerRegister extends StatefulWidget {
   final AuthResponse authResponse;
@@ -27,7 +27,8 @@ class _TrainerRegisterState extends State<TrainerRegister> {
       _enabled = trainerCreate.name != '' &&
           trainerCreate.phone != '' &&
           trainerCreate.years != 0 &&
-          trainerCreate.addressList.length > 0;
+          trainerCreate.addressList.length > 0 &&
+          trainerCreate.historyList.length > 0;
     });
   }
 

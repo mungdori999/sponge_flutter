@@ -10,7 +10,7 @@ import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/http/auth_response.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
-import 'package:sponge_app/screen/trainer/trainer_register.dart';
+import 'package:sponge_app/screen/trainer/craete/trainer_register.dart';
 import 'package:sponge_app/token/jwt_token.dart';
 
 class KakaoLoginButton extends StatelessWidget {

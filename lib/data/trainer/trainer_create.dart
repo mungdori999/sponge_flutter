@@ -66,7 +66,6 @@ class HistoryCreate {
     this.endDt = '',
     this.description = '',
   });
-
   HistoryCreate copy() {
     return HistoryCreate(
       title: this.title,

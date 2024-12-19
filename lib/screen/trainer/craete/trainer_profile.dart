@@ -253,6 +253,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
       onTap: () {
         setState(() {
           _selectedGender = index; // 선택된 버튼 인덱스 업데이트
+          _updateButtonState();
         });
       },
       child: Container(

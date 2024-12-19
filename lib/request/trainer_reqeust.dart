@@ -30,6 +30,7 @@ Future<Trainer> getMyInfo() async {
     throw Exception('Error occurred: $e');
   }
 }
+
 Future<void> createTrainer(TrainerCreate trainerCreate) async {
   final _dio = Dio();
   final secureStorage = FlutterSecureStorage();
@@ -59,6 +60,23 @@ Future<void> createTrainer(TrainerCreate trainerCreate) async {
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<void> updateTrainer(int id, TrainerCreate trainerCreate) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/trainer/${id}',
+  ).toString();
+
+  try {
+    final response = await _dio.patch(url, data: trainerCreate.toJson());
+    // 응답 코드가 200번대일 때 처리
   } catch (e) {
     throw Exception('Error occurred: $e');
   }
