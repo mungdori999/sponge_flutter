@@ -11,6 +11,14 @@ class CommonTop extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        Text(
+          '내 진단',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Spacer(),
         IconButton(
             onPressed: () {
               Navigator.push(
