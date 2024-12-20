@@ -65,6 +65,13 @@ class _PostScreenState extends State<PostScreen> {
                 SizedBox(
                   height: 24,
                 ),
+                if(userAuth.loginType==LoginType.TRAINER.value)...[
+                  Row(
+                    children: [
+
+                    ],
+                  )
+                ],
                 Container(
                   height: 8,
                   color: lightGrey,

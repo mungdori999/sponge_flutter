@@ -6,7 +6,7 @@ import 'package:sponge_app/component/top/home_top.dart';
 import 'package:sponge_app/component/top/my_page_top.dart';
 import 'package:sponge_app/component/top/post_list_top.dart';
 import 'package:sponge_app/screen/main/home_screen.dart';
-import 'package:sponge_app/screen/main/my_activity.dart';
+import 'package:sponge_app/screen/main/select_my_activity.dart';
 import 'package:sponge_app/screen/main/post_list_screen.dart';
 import 'package:sponge_app/screen/main/select_my_page.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
@@ -15,7 +15,7 @@ class MainScreen extends StatelessWidget {
   final List<Widget> _pages = [
     HomeScreen(),
     PostListScreen(),
-    MyActivity(),
+    SelectMyActivity(),
     SelectMyPage(),
   ];
 

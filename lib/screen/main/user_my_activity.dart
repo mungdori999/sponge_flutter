@@ -5,14 +5,14 @@ import 'package:sponge_app/data/post/post_list_response.dart';
 import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 
-class MyActivity extends StatefulWidget {
-  const MyActivity({super.key});
+class UserMyActivity extends StatefulWidget {
+  const UserMyActivity({super.key});
 
   @override
-  State<MyActivity> createState() => _MyActivityState();
+  State<UserMyActivity> createState() => _UserMyActivityState();
 }
 
-class _MyActivityState extends State<MyActivity> {
+class _UserMyActivityState extends State<UserMyActivity> {
   int _selectedIndex = 1;
   List<Post> postList = [];
   final ScrollController _scrollController = ScrollController();
@@ -107,7 +107,6 @@ class _MyActivityState extends State<MyActivity> {
                           _initPage();
                           postList = await getMyPost(currentPage);
                           currentPage++;
-                          if (postList.length < 10) hasMorePosts = false;
                           setState(() {
                             _selectedIndex = 1; // 첫 번째 버튼 선택 시
                           });
@@ -139,7 +138,6 @@ class _MyActivityState extends State<MyActivity> {
                           _initPage();
                           postList = await getMyPostByBookmark(currentPage);
                           currentPage++;
-                          if (postList.length < 10) hasMorePosts = false;
                           setState(() {
                             _selectedIndex = 2;
                           });

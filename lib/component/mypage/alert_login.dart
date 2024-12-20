@@ -9,7 +9,7 @@ class AlertLogin extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('주의'),
-      content: Text('견주 로그인이 필요합니다.'),
+      content: Text('로그인이 필요합니다.'),
       actions: [
         TextButton(
           onPressed: () {

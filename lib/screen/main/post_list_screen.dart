@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_app/component/mypage/alert_login.dart';
 import 'package:sponge_app/component/post/post_list.dart';
 import 'package:sponge_app/const/color_const.dart';
@@ -8,6 +9,7 @@ import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/pet_request.dart';
 import 'package:sponge_app/screen/write/select_pet.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
+import 'package:sponge_app/util/page_index_provider.dart';
 
 class PostListScreen extends StatefulWidget {
   const PostListScreen({super.key});
@@ -82,7 +84,20 @@ class _PostListScreenState extends State<PostListScreen> {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return AlertLogin();
+                  return AlertDialog(
+                    title: Text('주의'),
+                    content: Text('견주 로그인이 필요합니다.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Provider.of<PageIndexProvider>(context, listen: false)
+                              .updateIndex(0);
+                        },
+                        child: Text('닫기'),
+                      ),
+                    ],
+                  );
                 },
               );
             });
