@@ -155,6 +155,32 @@ Future<CheckResponse> getMyCheck(int postId) async {
     throw Exception('Error occurred: $e');
   }
 }
+Future<List<Post>> getMyPostByBookmark(int page) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/post/bookmark',
+    queryParameters: {
+      'page': page.toString(),
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final List<dynamic> data = response.data;
+      return data.map((item) => Post.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
 
 Future<void> updateBookmark(int postId) async {
   var _dio = await authDio();

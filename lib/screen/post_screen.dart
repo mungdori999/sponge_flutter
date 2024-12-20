@@ -38,6 +38,7 @@ class _PostScreenState extends State<PostScreen> {
         return Container(); // 데이터 로딩 중
       }
       if (snapshot.hasError) {
+        print(snapshot.error);
         return Text('오류 발생: ${snapshot.error}');
       }
       if (snapshot.hasData) {
@@ -45,7 +46,6 @@ class _PostScreenState extends State<PostScreen> {
         final LoginAuth userAuth = results[0];
         final PostResponse post = results[1];
         final CheckResponse check = results[2];
-
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(

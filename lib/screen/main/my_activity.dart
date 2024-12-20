@@ -19,35 +19,50 @@ class _MyActivityState extends State<MyActivity> {
   int currentPage = 0;
   bool isLoading = false;
   bool hasMorePosts = true;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     _initializeData();
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  _initPage() {
+    currentPage = 0;
+    isLoading = false;
+    hasMorePosts = true;
+  }
 
   Future<void> _initializeData() async {
-    final myPost = await getMyPost(currentPage);
+    final List<Post> myPost = _selectedIndex == 1
+        ? await getMyPost(currentPage)
+        : _selectedIndex == 2
+            ? await getMyPostByBookmark(currentPage)
+            : [];
 
     setState(() {
       postList.addAll(myPost);
       currentPage++;
     });
   }
+
   Future<void> _fetchMorePosts() async {
     if (isLoading || !hasMorePosts) return;
     setState(() {
       isLoading = true;
     });
-
     try {
-      final newPosts = await getMyPost(currentPage);
+      final List<Post> newPosts = _selectedIndex == 1
+          ? await getMyPost(currentPage)
+          : _selectedIndex == 2
+              ? await getMyPostByBookmark(currentPage)
+              : [];
       setState(() {
         if (newPosts.isEmpty) {
           hasMorePosts = false;
@@ -67,16 +82,12 @@ class _MyActivityState extends State<MyActivity> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !isLoading) {
-      if(_selectedIndex==1) {
       _fetchMorePosts();
-      }
-      if(_selectedIndex==2) {
-
-      }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +103,11 @@ class _MyActivityState extends State<MyActivity> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          _initPage();
+                          postList = await getMyPost(currentPage);
+                          currentPage++;
+                          if (postList.length < 10) hasMorePosts = false;
                           setState(() {
                             _selectedIndex = 1; // 첫 번째 버튼 선택 시
                           });
@@ -100,7 +115,8 @@ class _MyActivityState extends State<MyActivity> {
                         child: Text(
                           '활동내역',
                           style: TextStyle(
-                            color: _selectedIndex == 1 ? Colors.black : mainGrey,
+                            color:
+                                _selectedIndex == 1 ? Colors.black : mainGrey,
                             fontSize: 16,
                             fontWeight: _selectedIndex == 1
                                 ? FontWeight.w700
@@ -110,9 +126,7 @@ class _MyActivityState extends State<MyActivity> {
                       ),
                       Container(
                         height: 2, // 선의 두께
-                        color: _selectedIndex == 1
-                            ? mediumGrey
-                            : lightGrey, // 선택된 버튼은 검정색, 나머지는 회색
+                        color: _selectedIndex == 1 ? mediumGrey : lightGrey,
                       ),
                     ],
                   ),
@@ -121,15 +135,20 @@ class _MyActivityState extends State<MyActivity> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          _initPage();
+                          postList = await getMyPostByBookmark(currentPage);
+                          currentPage++;
+                          if (postList.length < 10) hasMorePosts = false;
                           setState(() {
-                            _selectedIndex = 2; // 두 번째 버튼 선택 시
+                            _selectedIndex = 2;
                           });
                         },
                         child: Text(
                           '저장한글',
                           style: TextStyle(
-                            color: _selectedIndex == 2 ? Colors.black : mainGrey,
+                            color:
+                                _selectedIndex == 2 ? Colors.black : mainGrey,
                             fontSize: 16,
                             fontWeight: _selectedIndex == 2
                                 ? FontWeight.w700
@@ -141,41 +160,105 @@ class _MyActivityState extends State<MyActivity> {
                         height: 2,
                         color: _selectedIndex == 2 ? mediumGrey : lightGrey,
                       ),
-
                     ],
                   ),
                 ),
               ],
             ),
-            if(_selectedIndex ==1)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('내가쓴 글',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
-                  ...postList
-                      .map(
-                        (post) => GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostScreen(id: post.id),
-                        ),
-                      ),
-                      child: Card(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: HomePostCard(post: post),
-                        ),
-                      ),
+            if (_selectedIndex == 1)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '내가쓴 글',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
-                  )
-                      .toList(),
-                ],
+                    ...postList
+                        .map(
+                          (post) => GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PostScreen(id: post.id),
+                              ),
+                            ),
+                            child: Card(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: HomePostCard(post: post),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    if (isLoading)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    if (!hasMorePosts)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text('더 이상 게시글이 없습니다.'),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            )
+            if (_selectedIndex == 2)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '저장한 글',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                    ...postList
+                        .map(
+                          (post) => GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PostScreen(id: post.id),
+                              ),
+                            ),
+                            child: Card(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: HomePostCard(post: post),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    if (isLoading)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    if (!hasMorePosts)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text('더 이상 게시글이 없습니다.'),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
