@@ -4,11 +4,11 @@ import 'package:sponge_app/data/trainer/trainer.dart';
 
 class TrainerProfileHistory extends StatelessWidget {
   final List<History> historyList;
+
   const TrainerProfileHistory({super.key, required this.historyList});
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -19,14 +19,19 @@ class TrainerProfileHistory extends StatelessWidget {
                 '경력',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
-              SizedBox(width: 8,),
+              SizedBox(
+                width: 8,
+              ),
               Text(
                 historyList.length.toString(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,color: mainGrey),
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w700, color: mainGrey),
               ),
             ],
           ),
-          SizedBox(height: 8,),
+          SizedBox(
+            height: 8,
+          ),
           Column(
             children: historyList.map((history) {
               return Row(
@@ -78,7 +83,9 @@ class TrainerProfileHistory extends StatelessWidget {
                             color: mainGrey,
                           ),
                         ),
-                        SizedBox(height: 8,),
+                        SizedBox(
+                          height: 12,
+                        ),
                       ],
                     ),
                   ),
@@ -97,5 +104,4 @@ class TrainerProfileHistory extends StatelessWidget {
     String month = date.substring(4, 6); // 뒤의 2자리: 월
     return "$year.$month";
   }
-
 }

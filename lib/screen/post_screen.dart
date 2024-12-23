@@ -28,11 +28,12 @@ class _PostScreenState extends State<PostScreen> {
     return FutureBuilder(future: Future(() async {
       final userAuth = await jwtUtil.getJwtToken();
       final post = await getPost(widget.id);
-      CheckResponse checkResponse = new CheckResponse(likeCheck: false, bookmarkCheck: false);
+      CheckResponse checkResponse =
+          new CheckResponse(likeCheck: false, bookmarkCheck: false);
       if (userAuth.loginType == LoginType.USER.value && userAuth.id != 0) {
         checkResponse = await getMyCheck(post.id);
       }
-      return [userAuth, post,checkResponse];
+      return [userAuth, post, checkResponse];
     }), builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return Container(); // 데이터 로딩 중
@@ -65,12 +66,60 @@ class _PostScreenState extends State<PostScreen> {
                 SizedBox(
                   height: 24,
                 ),
-                if(userAuth.loginType==LoginType.TRAINER.value)...[
-                  Row(
-                    children: [
+                if (userAuth.loginType == LoginType.TRAINER.value) ...[
+                  Container(
+                    height: 8,
+                    color: lightGrey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${userAuth.name} 훈련사님의',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 16),
+                            ),
+                            Text(
+                              '진단이 필요한 게시글이에요',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () {
 
-                    ],
-                  )
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 30),
+                            decoration: BoxDecoration(
+                              color:  mainYellow ,
+                              border: Border.all(
+                                color: mainYellow,
+                                width: 1,
+                              ), // 배경색 변경
+                              borderRadius: BorderRadius.circular(8), // 모서리 둥글게
+                            ),
+                            child: Text(
+                              "답변 쓰기",
+                              style: TextStyle(
+                                color: Colors.white,
+                                // 텍스트 색상 변경
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
                 Container(
                   height: 8,
