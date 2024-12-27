@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/post/post_details.dart';
 import 'package:sponge_app/component/top/common_top.dart';
+import 'package:sponge_app/component/top/screen_top.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
+import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/post/check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
+import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/request/post_request.dart';
+import 'package:sponge_app/screen/answer/write_answer.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 
 class PostScreen extends StatefulWidget {
@@ -22,18 +26,27 @@ class PostScreen extends StatefulWidget {
 
 class _PostScreenState extends State<PostScreen> {
   JwtUtil jwtUtil = new JwtUtil();
+  bool trainerAnswer = true;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(future: Future(() async {
-      final userAuth = await jwtUtil.getJwtToken();
+      final loginAuth = await jwtUtil.getJwtToken();
       final post = await getPost(widget.id);
       CheckResponse checkResponse =
           new CheckResponse(likeCheck: false, bookmarkCheck: false);
-      if (userAuth.loginType == LoginType.USER.value && userAuth.id != 0) {
+      final answerList = await getAnswerList(widget.id);
+      if (loginAuth.loginType == LoginType.USER.value && loginAuth.id != 0) {
         checkResponse = await getMyCheck(post.id);
       }
-      return [userAuth, post, checkResponse];
+      await Future.forEach(answerList, (answer) {
+        if (answer.trainerShortResponse.id == loginAuth.id) {
+          trainerAnswer = false;
+        } else {
+          trainerAnswer = true;
+        }
+      });
+      return [loginAuth, post, checkResponse, answerList];
     }), builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return Container(); // 데이터 로딩 중
@@ -44,13 +57,14 @@ class _PostScreenState extends State<PostScreen> {
       }
       if (snapshot.hasData) {
         final results = snapshot.data as List;
-        final LoginAuth userAuth = results[0];
+        final LoginAuth loginAuth = results[0];
         final PostResponse post = results[1];
         final CheckResponse check = results[2];
+        final List<AnswerListResponse> answerList = results[3];
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const CommonTop(),
+            title: const ScreenTop(),
             backgroundColor: Colors.white,
             scrolledUnderElevation: 0,
           ),
@@ -59,14 +73,15 @@ class _PostScreenState extends State<PostScreen> {
               children: [
                 PostDetails(
                   post: post,
-                  myPost: userAuth.id == post.userId,
+                  myPost: loginAuth.id == post.userId,
                   check: check,
-                  loginType: userAuth.loginType,
+                  loginType: loginAuth.loginType,
                 ),
                 SizedBox(
                   height: 24,
                 ),
-                if (userAuth.loginType == LoginType.TRAINER.value) ...[
+                if (loginAuth.loginType == LoginType.TRAINER.value &&
+                    trainerAnswer) ...[
                   Container(
                     height: 8,
                     color: lightGrey,
@@ -80,7 +95,7 @@ class _PostScreenState extends State<PostScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${userAuth.name} 훈련사님의',
+                              '${loginAuth.name} 훈련사님의',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700, fontSize: 16),
                             ),
@@ -93,13 +108,20 @@ class _PostScreenState extends State<PostScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WriteAnswer(
+                                  post: post,
+                                ),
+                              ),
+                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 vertical: 8, horizontal: 30),
                             decoration: BoxDecoration(
-                              color:  mainYellow ,
+                              color: mainYellow,
                               border: Border.all(
                                 color: mainYellow,
                                 width: 1,
@@ -167,7 +189,19 @@ class _PostScreenState extends State<PostScreen> {
                       ),
                     ],
                   ),
-                )
+                ),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: lightGrey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(14),
+                    ),
+                  ),
+                  child: Column(
+                    children: [],
+                  ),
+                ),
               ],
             ),
           ),
