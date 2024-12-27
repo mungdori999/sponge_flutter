@@ -29,28 +29,19 @@ class AnswerResponse {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'content': content,
-      'likeCount': likeCount,
-      'createdAt': createdAt.toIso8601String(),
-      'modifiedAt': modifiedAt.toIso8601String(),
-      'postId': postId,
-      'trainerId': trainerId,
-    };
-  }
 }
 
 class TrainerShortResponse {
   final int id;
   final String name;
+  final String profileImgUrl;
   final int adoptCount;
   final int chatCount;
 
   TrainerShortResponse({
     required this.id,
     required this.name,
+    required this.profileImgUrl,
     required this.adoptCount,
     required this.chatCount,
   });
@@ -59,19 +50,12 @@ class TrainerShortResponse {
     return TrainerShortResponse(
       id: json['id'],
       name: json['name'],
+      profileImgUrl: json['profileImgUrl'],
       adoptCount: json['adoptCount'],
       chatCount: json['chatCount'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'adoptCount': adoptCount,
-      'chatCount': chatCount,
-    };
-  }
 }
 
 class AnswerListResponse {
@@ -94,11 +78,4 @@ class AnswerListResponse {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'answerResponse': answerResponse.toJson(),
-      'trainerShortResponse': trainerShortResponse.toJson(),
-      'checkAdopt': checkAdopt,
-    };
-  }
 }
