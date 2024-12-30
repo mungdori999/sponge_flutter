@@ -3,28 +3,33 @@ import 'package:sponge_app/const/category_code.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/answer/answer_create.dart';
+import 'package:sponge_app/data/answer/answer_response.dart';
+import 'package:sponge_app/data/answer/answer_update.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/util/convert.dart';
 
-class WriteAnswer extends StatefulWidget {
+class UpdateAnswer extends StatefulWidget {
   final PostResponse post;
+  AnswerListResponse answer;
 
-  const WriteAnswer({super.key, required this.post});
+  UpdateAnswer({super.key, required this.post, required this.answer});
 
   @override
-  State<WriteAnswer> createState() => _WriteAnswerState();
+  State<UpdateAnswer> createState() => _UpdateAnswerState();
 }
 
-class _WriteAnswerState extends State<WriteAnswer> {
-  late TextEditingController _contentController = TextEditingController();
+class _UpdateAnswerState extends State<UpdateAnswer> {
+  late TextEditingController _contentController;
   bool showMore = false;
   bool enabled = false;
 
   @override
   void initState() {
     super.initState();
+    _contentController =
+        TextEditingController(text: widget.answer.answerResponse.content);
     _contentController.addListener(_updateButtonState);
   }
 
@@ -61,7 +66,7 @@ class _WriteAnswerState extends State<WriteAnswer> {
                             return AlertDialog(
                               backgroundColor: Colors.white,
                               title: Text(
-                                '답변을 등록하시겠습니까?',
+                                '답변을 수정하시겠습니까?',
                                 textAlign: TextAlign.center,
                               ),
                               titleTextStyle: TextStyle(
@@ -77,25 +82,26 @@ class _WriteAnswerState extends State<WriteAnswer> {
                                       width: 120,
                                       child: ElevatedButton(
                                         onPressed: () async {
-                                          AnswerCreate answerCreate =
-                                              new AnswerCreate(
-                                                  postId: widget.post.id,
+                                          AnswerUpdate answerUpdate =
+                                              new AnswerUpdate(
                                                   content:
                                                       _contentController.text);
-                                          await createAnswer(answerCreate);
+                                          await updateAnswer(
+                                              widget.answer.answerResponse.id,
+                                              answerUpdate);
                                           // 첫 번째: 모든 페이지를 제거하고 초기 화면으로 이동
                                           Navigator.pushNamedAndRemoveUntil(
                                             context,
                                             '/', // 초기 화면으로 이동 (모든 스택 제거)
-                                                (Route<dynamic> route) => false,
+                                            (Route<dynamic> route) => false,
                                           );
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => PostScreen(id: widget.post.id),
+                                              builder: (context) => PostScreen(
+                                                  id: widget.post.id),
                                             ),
                                           );
-
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: mainYellow, // 배경색 설정
@@ -106,7 +112,7 @@ class _WriteAnswerState extends State<WriteAnswer> {
                                           elevation: 0, // 그림자 제거
                                         ),
                                         child: Text(
-                                          '등록',
+                                          '수정',
                                           style: TextStyle(
                                             color: Colors.white, // 텍스트 색상 설정
                                             fontWeight: FontWeight.w700,
