@@ -4,25 +4,25 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/request/post_request.dart';
 
-class LikeButton extends StatefulWidget {
+class PostLikeButton extends StatefulWidget {
   final int postId;
   final String loginType;
   int likeCount;
   bool flag;
 
-  LikeButton({super.key, required this.postId, required this.likeCount,required this.flag, required this.loginType});
+  PostLikeButton({super.key, required this.postId, required this.likeCount,required this.flag, required this.loginType});
 
   @override
-  State<LikeButton> createState() => _LikeButtonState();
+  State<PostLikeButton> createState() => _PostLikeButtonState();
 }
 
-class _LikeButtonState extends State<LikeButton> {
+class _PostLikeButtonState extends State<PostLikeButton> {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () async {
         if(widget.loginType == LoginType.USER.value) {
-          await updateLike(widget.postId);
+          await updatePostLike(widget.postId);
           setState(() {
             widget.flag ? widget.likeCount-- : widget.likeCount++;
             widget.flag = !widget.flag;

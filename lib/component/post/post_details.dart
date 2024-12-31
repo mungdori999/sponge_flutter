@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/post/bookmark_button.dart';
-import 'package:sponge_app/component/post/like_button.dart';
+import 'package:sponge_app/component/post/post_like_button.dart';
 import 'package:sponge_app/const/category_code.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
@@ -216,7 +216,7 @@ class PostDetails extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  LikeButton(
+                  PostLikeButton(
                     postId: post.id,
                     likeCount: post.likeCount,
                     flag: check.likeCheck,

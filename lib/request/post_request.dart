@@ -207,7 +207,7 @@ Future<void> updateBookmark(int postId) async {
   }
 }
 
-Future<void> updateLike(int postId) async {
+Future<void> updatePostLike(int postId) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,

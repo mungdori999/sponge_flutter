@@ -97,3 +97,28 @@ Future<void> deleteAnswer(int id) async {
     throw Exception('Error occurred: $e');
   }
 }
+
+Future<void> updateAnswerLike(int answerId) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/answer/like',
+    queryParameters: {
+      'answerId': answerId.toString(),
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.post(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
