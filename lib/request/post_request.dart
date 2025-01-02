@@ -32,6 +32,34 @@ Future<PostResponse> getPost(int id) async {
   }
 }
 
+Future<List<Post>> getAllPost(int categoryCode, int page) async {
+  var _dio = Dio();
+
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/post',
+    queryParameters: {
+      'categoryCode': categoryCode.toString(),
+      'page': page.toString(),
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.get(url);
+    if (response.statusCode == ok) {
+      // UTF-8로 디코딩 후 JSON 데이터 파싱
+      final List<dynamic> data = response.data;
+      return data.map((item) => Post.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
 Future<List<Post>> getMyPost(int page) async {
   var _dio = await authDio();
   final url = Uri(

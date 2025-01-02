@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sponge_app/component/mypage/alert_login.dart';
-import 'package:sponge_app/component/post/post_list.dart';
+import 'package:sponge_app/component/post/category_list.dart';
+import 'package:sponge_app/component/post/post_card.dart';
+import 'package:sponge_app/const/category_code.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/pet/pet.dart';
+import 'package:sponge_app/data/post/post_list_response.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/pet_request.dart';
+import 'package:sponge_app/request/post_request.dart';
+import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/screen/write/select_pet.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
@@ -19,10 +23,82 @@ class PostListScreen extends StatefulWidget {
 }
 
 class _PostListScreenState extends State<PostListScreen> {
+  final ScrollController _scrollController = ScrollController();
+  int selectedIndex = 0;
+  List<Post> postList = [];
+  int currentPage = 0;
+  bool isLoading = false;
+  bool hasMorePosts = true;
+
+  List<String> categoryList =
+      CategoryCode.values.map((category) => category.description).toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    _initializeData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  _initPage() {
+    currentPage = 0;
+    isLoading = false;
+    hasMorePosts = true;
+  }
+
+  Future<void> _initializeData() async {
+    final List<Post> post = await getAllPost(0, currentPage);
+    setState(() {
+      postList.addAll(post);
+      currentPage++;
+    });
+  }
+
+  Future<void> _fetchMorePosts() async {
+    if (isLoading || !hasMorePosts) return;
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      int categoryCode = CategoryCode.getCodeByDescription(categoryList[selectedIndex]);
+      final List<Post> newPosts = await getAllPost(categoryCode, currentPage);
+      print(currentPage);
+      setState(() {
+        if (newPosts.isEmpty) {
+          hasMorePosts = false;
+        } else {
+          postList.addAll(newPosts);
+          currentPage++;
+        }
+      });
+    } catch (e) {
+      print('Error fetching posts: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        !isLoading) {
+      _fetchMorePosts();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Container(
           width: double.infinity,
           color: lightGrey,
@@ -70,7 +146,56 @@ class _PostListScreenState extends State<PostListScreen> {
                   ],
                 ),
               ),
-              PostList(),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24), // 왼쪽 상단 모서리
+                    topRight: Radius.circular(24), // 오른쪽 상단 모서리
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 12,
+                    ),
+                    CategoryList(
+                        categoryPressed: categoryPressed,
+                        categoryList: categoryList,
+                        selectedIndex: selectedIndex),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 1,
+                      color: Colors.grey[400],
+                    ),
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: 8,
+                        ),
+                        ...postList
+                            .map(
+                              (post) => GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PostScreen(id: post.id),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  child: PostCard(post: post),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -79,7 +204,8 @@ class _PostListScreenState extends State<PostListScreen> {
         onPressed: () async {
           JwtUtil jwtUtil = JwtUtil();
           LoginAuth loginAuth = await jwtUtil.getJwtToken();
-          if (loginAuth.id == 0 || loginAuth.loginType != LoginType.USER.value) {
+          if (loginAuth.id == 0 ||
+              loginAuth.loginType != LoginType.USER.value) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               showDialog(
                 context: context,
@@ -125,5 +251,17 @@ class _PostListScreenState extends State<PostListScreen> {
       floatingActionButtonLocation:
           FloatingActionButtonLocation.endFloat, // 오른쪽 아래 고정
     );
+  }
+
+  void categoryPressed(int index) async {
+    selectedIndex = index;
+    int categoryCode = CategoryCode.getCodeByDescription(categoryList[index]);
+    final List<Post> post = await getAllPost(categoryCode, 0);
+    setState(() {
+      postList = [];
+      postList.addAll(post);
+      _initPage();
+      currentPage++;
+    });
   }
 }
