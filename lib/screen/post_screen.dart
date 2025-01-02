@@ -5,14 +5,13 @@ import 'package:sponge_app/component/top/screen_top.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
-import 'package:sponge_app/data/post/check_response.dart';
+import 'package:sponge_app/data/post/post_check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/screen/answer/write_answer.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
-import 'package:sponge_app/util/convert.dart';
 
 class PostScreen extends StatefulWidget {
   final int id;
@@ -29,8 +28,8 @@ class _PostScreenState extends State<PostScreen> {
   LoginAuth? loginAuth;
   PostResponse? post;
   List<AnswerListResponse>? answerList = [];
-  CheckResponse check =
-      new CheckResponse(likeCheck: false, bookmarkCheck: false);
+  PostCheckResponse check =
+      new PostCheckResponse(likeCheck: false, bookmarkCheck: false);
 
   @override
   void initState() {
@@ -43,7 +42,7 @@ class _PostScreenState extends State<PostScreen> {
     post = await getPost(widget.id);
     answerList = await getAnswerList(widget.id);
     if (loginAuth!.loginType == LoginType.USER.value && loginAuth!.id != 0) {
-      check = await getMyCheck(post!.id);
+      check = await getMyPostCheck(post!.id);
     }
     await Future.forEach(answerList!, (answer) {
       if (answer.trainerShortResponse.id == loginAuth!.id) {

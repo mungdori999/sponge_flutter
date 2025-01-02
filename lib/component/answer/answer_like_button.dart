@@ -1,33 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
-import 'package:sponge_app/data/answer/answer_response.dart';
-import 'package:sponge_app/data/user/user_auth.dart';
+import 'package:sponge_app/data/answer/answer_check_response.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 
 class AnswerLikeButton extends StatefulWidget {
   final int answerId;
   final String loginType;
   int likeCount;
-  bool flag;
-  AnswerLikeButton({super.key, required this.loginType, required this.likeCount, required this.flag, required this.answerId});
 
+  AnswerLikeButton(
+      {super.key,
+      required this.loginType,
+      required this.likeCount,
+      required this.answerId});
 
   @override
   State<AnswerLikeButton> createState() => _AnswerLikeButtonState();
 }
 
 class _AnswerLikeButtonState extends State<AnswerLikeButton> {
+  bool flag = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.loginType == LoginType.USER.value) {
+      _initData();
+    }
+  }
+
+  _initData() async {
+    AnswerCheckResponse answerCheckResponse =
+        await getMyAnswerCheck(widget.answerId);
+    setState(() {
+      flag = answerCheckResponse.likeCheck;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () async{
+      onPressed: () async {
         if (widget.loginType == LoginType.USER.value) {
-          // await updateAnswerLike(widget.answerId);
+          await updateAnswerLike(widget.answerId);
           setState(() {
-            widget.flag ? widget.likeCount-- : widget.likeCount++;
-            widget.flag = !widget.flag;
+            flag ? widget.likeCount-- : widget.likeCount++;
+            flag = !flag;
           });
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -64,7 +83,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
           ),
           Icon(
             Icons.thumb_up_outlined,
-            color:widget.flag ? mainYellow : mainGrey,
+            color: flag ? mainYellow : mainGrey,
             size: 16,
           ),
           SizedBox(
@@ -72,7 +91,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
           ),
           Text(
             '추천 ${widget.likeCount}',
-            style: TextStyle(color:widget.flag ? mainYellow : mainGrey),
+            style: TextStyle(color: flag ? mainYellow : mainGrey),
           )
         ],
       ),

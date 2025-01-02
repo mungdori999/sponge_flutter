@@ -186,7 +186,6 @@ class AnswerDetails extends StatelessWidget {
                 answerId: answer.answerResponse.id,
                 loginType: loginAuth.loginType,
                 likeCount: answer.answerResponse.likeCount,
-                flag: false,
               ),
               Row(
                 children: [

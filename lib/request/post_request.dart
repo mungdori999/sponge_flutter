@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:sponge_app/data/post/check_response.dart';
+import 'package:sponge_app/data/post/post_check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/post/post_create.dart';
 import 'package:sponge_app/data/post/post_list_response.dart';
@@ -129,7 +129,7 @@ Future<void> deletePost(int id) async {
   }
 }
 
-Future<CheckResponse> getMyCheck(int postId) async {
+Future<PostCheckResponse> getMyPostCheck(int postId) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
@@ -147,7 +147,7 @@ Future<CheckResponse> getMyCheck(int postId) async {
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
       final dynamic data = response.data;
-      return CheckResponse.from(data);
+      return PostCheckResponse.from(data);
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }

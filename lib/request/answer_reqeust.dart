@@ -1,3 +1,4 @@
+import 'package:sponge_app/data/answer/answer_check_response.dart';
 import 'package:sponge_app/data/answer/answer_create.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/answer/answer_update.dart';
@@ -90,6 +91,33 @@ Future<void> deleteAnswer(int id) async {
 
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<AnswerCheckResponse> getMyAnswerCheck(int answerId) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/answer/check',
+    queryParameters: {
+      'answerId': answerId.toString(),
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final dynamic data = response.data;
+      return AnswerCheckResponse.from(data);
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }

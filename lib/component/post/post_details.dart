@@ -4,7 +4,7 @@ import 'package:sponge_app/component/post/post_like_button.dart';
 import 'package:sponge_app/const/category_code.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
-import 'package:sponge_app/data/post/check_response.dart';
+import 'package:sponge_app/data/post/post_check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/screen/write/select_category.dart';
@@ -13,7 +13,7 @@ import 'package:sponge_app/util/convert.dart';
 class PostDetails extends StatelessWidget {
   final PostResponse post;
   final bool myPost;
-  final CheckResponse check;
+  final PostCheckResponse check;
   final String loginType;
 
   const PostDetails({super.key, required this.post, required this.myPost, required this.check, required this.loginType});
