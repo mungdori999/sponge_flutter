@@ -12,7 +12,7 @@ import 'package:sponge_app/util/convert.dart';
 
 class UpdateAnswer extends StatefulWidget {
   final PostResponse post;
-  AnswerListResponse answer;
+  AnswerDetailsListResponse answer;
 
   UpdateAnswer({super.key, required this.post, required this.answer});
 

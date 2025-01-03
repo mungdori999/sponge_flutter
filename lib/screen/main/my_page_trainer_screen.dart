@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/trainer/trainer_profile.dart';
+import 'package:sponge_app/component/trainer/trainer_profile_answer.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_history.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
+import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
 class MyPageTrainerScreen extends StatefulWidget {
@@ -15,19 +18,71 @@ class MyPageTrainerScreen extends StatefulWidget {
 class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
   Trainer? trainer;
   int _selectedIndex = 1;
+  List<AnswerBasicListResponse> answerList = [];
+  final ScrollController _scrollController = ScrollController();
+  int currentPage = 0;
+  bool isLoading = false;
+  bool hasMorePosts = true;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _initializeData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeData() async {
     final myInfo = await getMyInfo();
-
     setState(() {
       trainer = myInfo;
     });
+  }
+
+  _initPage() {
+    currentPage = 0;
+    isLoading = false;
+    hasMorePosts = true;
+  }
+
+  Future<void> _fetchMoreAnswer() async {
+    if (isLoading || !hasMorePosts) return;
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      if (_selectedIndex == 3) {
+        final List<AnswerBasicListResponse> newAnswerList =
+            await getMyAnswer(currentPage);
+        setState(() {
+          if (newAnswerList.isEmpty) {
+            hasMorePosts = false;
+          } else {
+            answerList.addAll(newAnswerList);
+            currentPage++;
+          }
+        });
+      }
+    } catch (e) {
+      print('Error fetching posts: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        !isLoading) {
+      _fetchMoreAnswer();
+    }
   }
 
   @override
@@ -43,6 +98,7 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -65,7 +121,8 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            _selectedIndex = 1; // 첫 번째 버튼 선택 시
+                            _selectedIndex = 1;
+                            _initPage();
                           });
                         },
                         child: Text(
@@ -115,8 +172,11 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          _initPage();
+                          answerList = await getMyAnswer(currentPage);
                           setState(() {
+                            currentPage++;
                             _selectedIndex = 3; // 세 번째 버튼 선택 시
                           });
                         },
@@ -145,9 +205,25 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
               TrainerProfileHistory(
                 historyList: trainer!.historyList,
               ),
+            if (_selectedIndex == 3)
+              Column(
+                children: [
+                  TrainerProfileAnswer(
+                    answerList: answerList,
+                  ),
+                  if (isLoading)
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
+
 }

@@ -137,8 +137,8 @@ class _UserMyActivityState extends State<UserMyActivity> {
                         onPressed: () async {
                           _initPage();
                           postList = await getMyPostByBookmark(currentPage);
-                          currentPage++;
                           setState(() {
+                            currentPage++;
                             _selectedIndex = 2;
                           });
                         },

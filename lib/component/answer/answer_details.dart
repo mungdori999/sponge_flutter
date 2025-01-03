@@ -10,7 +10,7 @@ import 'package:sponge_app/screen/answer/update_answer.dart';
 import 'package:sponge_app/util/convert.dart';
 
 class AnswerDetails extends StatelessWidget {
-  final AnswerListResponse answer;
+  final AnswerDetailsListResponse answer;
   final LoginAuth loginAuth;
   final VoidCallback deleteButton;
   final PostResponse post;

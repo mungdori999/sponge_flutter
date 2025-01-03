@@ -27,7 +27,7 @@ class _PostScreenState extends State<PostScreen> {
   bool trainerAnswer = true;
   LoginAuth? loginAuth;
   PostResponse? post;
-  List<AnswerListResponse>? answerList = [];
+  List<AnswerDetailsListResponse>? answerList = [];
   PostCheckResponse check =
       new PostCheckResponse(likeCheck: false, bookmarkCheck: false);
 

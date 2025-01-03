@@ -90,37 +90,44 @@ class _HomePostListState extends State<HomePostList> {
               children: [
                 SizedBox(height: 16),
                 ...postList
-                    .map((post) => GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PostScreen(id: post.id),
-                            ),
+                    .map(
+                      (post) => GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostScreen(id: post.id),
                           ),
-                          child: Card(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: HomePostCard(
-                                  post: post), // post 변수를 PostCard에 전달
-                            ),
+                        ),
+                        child: Card(
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: HomePostCard(
+                                post: post),
                           ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
-                SizedBox(height: 16,),
+                SizedBox(
+                  height: 16,
+                ),
                 ElevatedButton(
                   onPressed: () {
-                    Provider.of<PageIndexProvider>(context,
-                        listen: false)
+                    Provider.of<PageIndexProvider>(context, listen: false)
                         .updateIndex(1);
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: mainGrey, backgroundColor: Colors.white, // 텍스트 색상
-                    elevation: 4, // 그림자 효과
+                    foregroundColor: mainGrey,
+                    backgroundColor: Colors.white,
+                    // 텍스트 색상
+                    elevation: 4,
+                    // 그림자 효과
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12), // 모서리 둥글게
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12), // 내부 여백
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    // 내부 여백
                     side: BorderSide.none, // 테두리 없애기
                   ),
                   child: Row(
@@ -128,14 +135,17 @@ class _HomePostListState extends State<HomePostList> {
                     children: [
                       Text(
                         '진단사례 보러가기',
-                        style: TextStyle(color: mainGrey, fontSize: 16), // 텍스트 색상
+                        style:
+                            TextStyle(color: mainGrey, fontSize: 16), // 텍스트 색상
                       ),
                       SizedBox(width: 8), // 텍스트와 아이콘 간의 간격
                       Icon(Icons.add, color: mainYellow), // 아이콘 색상
                     ],
                   ),
                 ),
-                SizedBox(height: 16,),
+                SizedBox(
+                  height: 16,
+                ),
               ],
             ),
           ),

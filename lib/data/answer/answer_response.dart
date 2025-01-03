@@ -58,22 +58,39 @@ class TrainerShortResponse {
 
 }
 
-class AnswerListResponse {
+class AnswerDetailsListResponse {
   final AnswerResponse answerResponse;
   final TrainerShortResponse trainerShortResponse;
   final bool checkAdopt;
 
-  AnswerListResponse({
+  AnswerDetailsListResponse({
     required this.answerResponse,
     required this.trainerShortResponse,
     required this.checkAdopt,
   });
 
-  factory AnswerListResponse.fromJson(Map<String, dynamic> json) {
-    return AnswerListResponse(
+  factory AnswerDetailsListResponse.fromJson(Map<String, dynamic> json) {
+    return AnswerDetailsListResponse(
       answerResponse: AnswerResponse.fromJson(json['answerResponse']),
       trainerShortResponse:
       TrainerShortResponse.fromJson(json['trainerShortResponse']),
+      checkAdopt: json['checkAdopt'],
+    );
+  }
+}
+
+class AnswerBasicListResponse {
+  final AnswerResponse answerResponse;
+  final bool checkAdopt;
+
+  AnswerBasicListResponse({
+    required this.answerResponse,
+    required this.checkAdopt,
+  });
+
+  factory AnswerBasicListResponse.fromJson(Map<String, dynamic> json) {
+    return AnswerBasicListResponse(
+      answerResponse: AnswerResponse.fromJson(json['answerResponse']),
       checkAdopt: json['checkAdopt'],
     );
   }
