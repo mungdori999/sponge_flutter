@@ -1,3 +1,4 @@
+import 'package:sponge_app/data/answer/adopt_answer_create.dart';
 import 'package:sponge_app/data/answer/answer_check_response.dart';
 import 'package:sponge_app/data/answer/answer_create.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
@@ -24,13 +25,13 @@ Future<List<AnswerDetailsListResponse>> getAnswerList(int postId) async {
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
       final List<dynamic> data = response.data;
-      return data.map((item) => AnswerDetailsListResponse.fromJson(item)).toList();
+      return data
+          .map((item) => AnswerDetailsListResponse.fromJson(item))
+          .toList();
     } else {
-
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
   } catch (e) {
-
     throw Exception('Error occurred: $e');
   }
 }
@@ -53,16 +54,17 @@ Future<List<AnswerBasicListResponse>> getMyAnswer(int page) async {
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
       final List<dynamic> data = response.data;
-      return data.map((item) => AnswerBasicListResponse.fromJson(item)).toList();
+      return data
+          .map((item) => AnswerBasicListResponse.fromJson(item))
+          .toList();
     } else {
-
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
   } catch (e) {
-
     throw Exception('Error occurred: $e');
   }
 }
+
 Future<void> createAnswer(AnswerCreate answerCreate) async {
   var _dio = await authDio();
   final url = Uri(
@@ -84,7 +86,8 @@ Future<void> createAnswer(AnswerCreate answerCreate) async {
     throw Exception('Error occurred: $e');
   }
 }
-Future<void> updateAnswer(int id,AnswerUpdate answerUpdate) async {
+
+Future<void> updateAnswer(int id, AnswerUpdate answerUpdate) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
@@ -121,6 +124,29 @@ Future<void> deleteAnswer(int id) async {
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
     } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<void> createAdoptAnswer(AdoptAnswerCreate adoptAnswerCreate) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/answer/adopt',
+  ).toString();
+
+  try {
+    final response = await _dio.post(url, data: adoptAnswerCreate.toJson());
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+    } else {
+
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
   } catch (e) {

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/component/answer/answer_like_button.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
+import 'package:sponge_app/data/answer/adopt_answer_create.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/screen/answer/update_answer.dart';
+import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/util/convert.dart';
 
 class AnswerDetails extends StatelessWidget {
@@ -32,7 +34,7 @@ class AnswerDetails extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: lightGrey,
+              color: answer.checkAdopt ? lightYellow : lightGrey,
               borderRadius: BorderRadius.all(
                 Radius.circular(14),
               ),
@@ -118,33 +120,194 @@ class AnswerDetails extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 2.5,
-                          child: ElevatedButton(
-                            onPressed: () async {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: buttonGrey, // 배경색 설정
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8), // 모서리 둥글게 설정
+                        if (!answer.checkAdopt)
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width / 2.5,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                showModalBottomSheet(
+                                  context: context,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20)),
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  builder: (context) {
+                                    return FractionallySizedBox(
+                                      heightFactor: 0.7,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              Text(
+                                                "선택한 답변을 채택하시겠어요?",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 12,
+                                              ),
+                                              Text(
+                                                "답변이 도움이 되었나요?",
+                                                style: TextStyle(
+                                                  color: mediumGrey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Text(
+                                                "답변 채택 시 훈련사에게 큰 도움이 될 수 있어요.",
+                                                style: TextStyle(
+                                                  color: mediumGrey,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16),
+                                                child: OutlinedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    backgroundColor:
+                                                        lightYellow,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              40),
+                                                    ),
+                                                    side: BorderSide.none,
+                                                    minimumSize: Size(
+                                                        double.infinity, 48),
+                                                  ),
+                                                  child: Text(
+                                                    '닫기',
+                                                    style: TextStyle(
+                                                        color: mainYellow,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 8,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16),
+                                                child: OutlinedButton(
+                                                  onPressed: () async {
+                                                    AdoptAnswerCreate
+                                                        adoptAnswerCreate =
+                                                        new AdoptAnswerCreate(
+                                                            answerId: answer
+                                                                .answerResponse
+                                                                .id,
+                                                            trainerId: answer
+                                                                .trainerShortResponse
+                                                                .id,
+                                                            postId: answer
+                                                                .answerResponse
+                                                                .postId);
+                                                    await createAdoptAnswer(
+                                                        adoptAnswerCreate);
+                                                    Navigator
+                                                        .pushNamedAndRemoveUntil(
+                                                      context,
+                                                      '/',
+                                                      // 초기 화면으로 이동 (모든 스택 제거)
+                                                      (Route<dynamic> route) =>
+                                                          false,
+                                                    );
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            PostScreen(
+                                                                id: answer
+                                                                    .answerResponse
+                                                                    .postId),
+                                                      ),
+                                                    );
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    backgroundColor: mainYellow,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              40),
+                                                    ),
+                                                    side: BorderSide.none,
+                                                    minimumSize: Size(
+                                                        double.infinity, 48),
+                                                  ),
+                                                  child: Text(
+                                                    '채택하기',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 8,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: buttonGrey, // 배경색 설정
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(8), // 모서리 둥글게 설정
+                                ),
+                                elevation: 0, // 그림자 제거
                               ),
-                              elevation: 0, // 그림자 제거
-                            ),
-                            child: Text(
-                              '답변채택하기',
-                              style: TextStyle(
-                                color: Colors.white, // 텍스트 색상 설정
-                                fontWeight: FontWeight.w700,
+                              child: Text(
+                                '답변채택하기',
+                                style: TextStyle(
+                                  color: Colors.white, // 텍스트 색상 설정
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width / 2.5,
+                          width: answer.checkAdopt
+                              ? MediaQuery.of(context).size.width / 1.2
+                              : MediaQuery.of(context).size.width / 2.5,
                           child: ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: buttonGrey, // 배경색 설정
+                              backgroundColor: answer.checkAdopt
+                                  ? mainYellow
+                                  : buttonGrey, // 배경색 설정
                               shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(8), // 모서리 둥글게 설정
@@ -169,6 +332,26 @@ class AnswerDetails extends StatelessWidget {
           SizedBox(
             height: 8,
           ),
+          if (answer.checkAdopt) ...[
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: mainYellow,
+              ),
+              child: Text(
+                '채택한 답변',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+          ],
           Text(
             answer.answerResponse.content,
             style: TextStyle(

@@ -31,6 +31,8 @@ class _PostScreenState extends State<PostScreen> {
   PostCheckResponse check =
       new PostCheckResponse(likeCheck: false, bookmarkCheck: false);
 
+  int _selectedArrange = 1;
+
   @override
   void initState() {
     super.initState();
@@ -71,151 +73,165 @@ class _PostScreenState extends State<PostScreen> {
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            PostDetails(
-              post: post!,
-              myPost: loginAuth!.id == post!.userId,
-              check: check,
-              loginType: loginAuth!.loginType,
-            ),
-            SizedBox(
-              height: 24,
-            ),
-            if (loginAuth!.loginType == LoginType.TRAINER.value &&
-                trainerAnswer) ...[
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              PostDetails(
+                post: post!,
+                myPost: loginAuth!.id == post!.userId,
+                check: check,
+                loginType: loginAuth!.loginType,
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              if (loginAuth!.loginType == LoginType.TRAINER.value &&
+                  trainerAnswer) ...[
+                Container(
+                  height: 8,
+                  color: lightGrey,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${loginAuth!.name} 훈련사님의',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16),
+                          ),
+                          Text(
+                            '진단이 필요한 게시글이에요',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WriteAnswer(
+                                post: post!,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 30),
+                          decoration: BoxDecoration(
+                            color: mainYellow,
+                            border: Border.all(
+                              color: mainYellow,
+                              width: 1,
+                            ), // 배경색 변경
+                            borderRadius: BorderRadius.circular(8), // 모서리 둥글게
+                          ),
+                          child: Text(
+                            "답변 쓰기",
+                            style: TextStyle(
+                              color: Colors.white,
+                              // 텍스트 색상 변경
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               Container(
                 height: 8,
                 color: lightGrey,
               ),
+              SizedBox(
+                height: 16,
+              ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Text(
+                      '답변 ${answerList!.length}개',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Row(
                       children: [
-                        Text(
-                          '${loginAuth!.name} 훈련사님의',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedArrange = 1;
+                            });
+                          },
+                          child: Text(
+                            '최신순',
+                            style: TextStyle(
+                                color: _selectedArrange == 1
+                                    ? Colors.black
+                                    : mainGrey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
-                        Text(
-                          '진단이 필요한 게시글이에요',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedArrange = 2;
+                            });
+                          },
+                          child: Text(
+                            '추천순',
+                            style: TextStyle(
+                                color: _selectedArrange == 2
+                                    ? Colors.black
+                                    : mainGrey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WriteAnswer(
-                              post: post!,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                        decoration: BoxDecoration(
-                          color: mainYellow,
-                          border: Border.all(
-                            color: mainYellow,
-                            width: 1,
-                          ), // 배경색 변경
-                          borderRadius: BorderRadius.circular(8), // 모서리 둥글게
-                        ),
-                        child: Text(
-                          "답변 쓰기",
-                          style: TextStyle(
-                            color: Colors.white,
-                            // 텍스트 색상 변경
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),
               ),
+              ...answerList!
+                  .map(
+                    (answer) => AnswerDetails(
+                      answer: answer,
+                      post: post!,
+                      loginAuth: loginAuth!,
+                      deleteButton: () async {
+                        await deleteAnswer(answer.answerResponse.id);
+                        answerList = answerList!
+                            .where((item) => item != answer)
+                            .toList();
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('삭제되었습니다.'),
+                          ),
+                        );
+                        setState(() {});
+                      },
+                    ),
+                  )
+                  .toList(),
             ],
-            Container(
-              height: 8,
-              color: lightGrey,
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '답변 ${answerList!.length}개',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            '최신순',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            '추천순',
-                            style: TextStyle(
-                                color: mainGrey,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-            ...answerList!
-                .map(
-                  (answer) => AnswerDetails(
-                    answer: answer,
-                    post: post!,
-                    loginAuth: loginAuth!,
-                    deleteButton: () async {
-                      await deleteAnswer(answer.answerResponse.id);
-                      answerList =
-                          answerList!.where((item) => item != answer).toList();
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('삭제되었습니다.'),
-                        ),
-                      );
-                      setState(() {});
-                    },
-                  ),
-                )
-                .toList(),
-          ],
+          ),
         ),
       ),
     );

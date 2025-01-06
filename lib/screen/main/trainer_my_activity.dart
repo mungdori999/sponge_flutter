@@ -187,16 +187,17 @@ class _TrainerMyActivityState extends State<TrainerMyActivity> {
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                             color: answer.checkAdopt
-                                                ? lightYellow
+                                                ? mainYellow
                                                 : lightGrey,
                                           ),
                                           child: Text(
                                             answer.checkAdopt ? '채택됌' : '채택 안됌',
                                             style: TextStyle(
                                               color: answer.checkAdopt
-                                                  ? mainYellow
+                                                  ? Colors.white
                                                   : mainGrey,
                                               fontSize: 12,
+                                              fontWeight: FontWeight.w700
                                             ),
                                           ),
                                         ),
