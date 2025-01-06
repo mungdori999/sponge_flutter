@@ -25,7 +25,7 @@ class _SelectMyActivityState extends State<SelectMyActivity> {
 
   _initializeData() async {
     loginAuth = await jwtUtil.getJwtToken();
-    if (loginAuth == null) {
+    if (loginAuth!.id == 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showDialog(
           context: context,

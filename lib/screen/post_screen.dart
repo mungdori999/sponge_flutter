@@ -46,7 +46,11 @@ class _PostScreenState extends State<PostScreen> {
     if (loginAuth!.loginType == LoginType.USER.value && loginAuth!.id != 0) {
       check = await getMyPostCheck(post!.id);
     }
-    await Future.forEach(answerList!, (answer) {
+    await Future.forEach(answerList!, (answer) async{
+      if(loginAuth!.loginType == LoginType.USER.value && loginAuth!.id !=0) {
+        await getMyAnswerCheck(answer.answerResponse.id);
+      }
+
       if (answer.trainerShortResponse.id == loginAuth!.id) {
         trainerAnswer = false;
       } else {
@@ -175,6 +179,7 @@ class _PostScreenState extends State<PostScreen> {
                           onPressed: () {
                             setState(() {
                               _selectedArrange = 1;
+                              answerList!.sort((a, b) => b.answerResponse.createdAt.compareTo(a.answerResponse.createdAt));
                             });
                           },
                           child: Text(
@@ -191,6 +196,7 @@ class _PostScreenState extends State<PostScreen> {
                           onPressed: () {
                             setState(() {
                               _selectedArrange = 2;
+                              answerList!.sort((a, b) => b.answerResponse.likeCount.compareTo(a.answerResponse.likeCount));
                             });
                           },
                           child: Text(

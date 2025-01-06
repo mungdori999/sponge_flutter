@@ -25,6 +25,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
   @override
   void initState() {
     super.initState();
+
     if (widget.loginType == LoginType.USER.value) {
       _initData();
     }
@@ -40,6 +41,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
 
   @override
   Widget build(BuildContext context) {
+    print("답변아이디:${widget.answerId} 추천수:${widget.likeCount} ${flag}");
     return TextButton(
       onPressed: () async {
         if (widget.loginType == LoginType.USER.value) {
