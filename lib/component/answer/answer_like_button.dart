@@ -8,47 +8,31 @@ class AnswerLikeButton extends StatefulWidget {
   final int answerId;
   final String loginType;
   int likeCount;
+  bool flag;
 
   AnswerLikeButton(
       {super.key,
       required this.loginType,
       required this.likeCount,
-      required this.answerId});
+      required this.answerId,
+      required this.flag});
 
   @override
   State<AnswerLikeButton> createState() => _AnswerLikeButtonState();
 }
 
 class _AnswerLikeButtonState extends State<AnswerLikeButton> {
-  bool flag = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.loginType == LoginType.USER.value) {
-      _initData();
-    }
-  }
-
-  _initData() async {
-    AnswerCheckResponse answerCheckResponse =
-        await getMyAnswerCheck(widget.answerId);
-    setState(() {
-      flag = answerCheckResponse.likeCheck;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    print("답변아이디:${widget.answerId} 추천수:${widget.likeCount} ${flag}");
+    print("답변아이디:${widget.answerId} 추천수:${widget.likeCount} ${widget.flag}");
     return TextButton(
       onPressed: () async {
         if (widget.loginType == LoginType.USER.value) {
           await updateAnswerLike(widget.answerId);
           setState(() {
-            flag ? widget.likeCount-- : widget.likeCount++;
-            flag = !flag;
+            widget.flag ? widget.likeCount-- : widget.likeCount++;
+            widget.flag = !widget.flag;
           });
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -85,7 +69,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
           ),
           Icon(
             Icons.thumb_up_outlined,
-            color: flag ? mainYellow : mainGrey,
+            color: widget.flag ? mainYellow : mainGrey,
             size: 16,
           ),
           SizedBox(
@@ -93,7 +77,7 @@ class _AnswerLikeButtonState extends State<AnswerLikeButton> {
           ),
           Text(
             '추천 ${widget.likeCount}',
-            style: TextStyle(color: flag ? mainYellow : mainGrey),
+            style: TextStyle(color: widget.flag ? mainYellow : mainGrey),
           )
         ],
       ),

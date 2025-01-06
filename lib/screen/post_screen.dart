@@ -4,6 +4,7 @@ import 'package:sponge_app/component/post/post_details.dart';
 import 'package:sponge_app/component/top/screen_top.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
+import 'package:sponge_app/data/answer/answer_check_response.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/post/post_check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
@@ -42,13 +43,15 @@ class _PostScreenState extends State<PostScreen> {
   void _initData() async {
     loginAuth = await jwtUtil.getJwtToken();
     post = await getPost(widget.id);
-    answerList = await getAnswerList(widget.id);
     if (loginAuth!.loginType == LoginType.USER.value && loginAuth!.id != 0) {
       check = await getMyPostCheck(post!.id);
     }
-    await Future.forEach(answerList!, (answer) async{
-      if(loginAuth!.loginType == LoginType.USER.value && loginAuth!.id !=0) {
-        await getMyAnswerCheck(answer.answerResponse.id);
+    answerList = await getAnswerList(widget.id);
+    await Future.forEach(answerList!, (answer) async {
+      if (loginAuth!.loginType == LoginType.USER.value && loginAuth!.id != 0) {
+        AnswerCheckResponse answerCheckResponse =
+            await getMyAnswerCheck(answer.answerResponse.id);
+        answer.answerCheckResponse = answerCheckResponse;
       }
 
       if (answer.trainerShortResponse.id == loginAuth!.id) {
@@ -58,6 +61,23 @@ class _PostScreenState extends State<PostScreen> {
       }
     });
     setState(() {});
+  }
+
+  Future<void> setPost() async {
+    answerList = await getAnswerList(widget.id);
+    await Future.forEach(answerList!, (answer) async {
+      if (loginAuth!.loginType == LoginType.USER.value && loginAuth!.id != 0) {
+        AnswerCheckResponse answerCheckResponse =
+            await getMyAnswerCheck(answer.answerResponse.id);
+        answer.answerCheckResponse = answerCheckResponse;
+      }
+
+      if (answer.trainerShortResponse.id == loginAuth!.id) {
+        trainerAnswer = false;
+      } else {
+        trainerAnswer = true;
+      }
+    });
   }
 
   @override
@@ -176,10 +196,13 @@ class _PostScreenState extends State<PostScreen> {
                     Row(
                       children: [
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await setPost();
                             setState(() {
                               _selectedArrange = 1;
-                              answerList!.sort((a, b) => b.answerResponse.createdAt.compareTo(a.answerResponse.createdAt));
+                              answerList!.sort((a, b) => b
+                                  .answerResponse.createdAt
+                                  .compareTo(a.answerResponse.createdAt));
                             });
                           },
                           child: Text(
@@ -193,10 +216,13 @@ class _PostScreenState extends State<PostScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await setPost();
                             setState(() {
                               _selectedArrange = 2;
-                              answerList!.sort((a, b) => b.answerResponse.likeCount.compareTo(a.answerResponse.likeCount));
+                              answerList!.sort((a, b) => b
+                                  .answerResponse.likeCount
+                                  .compareTo(a.answerResponse.likeCount));
                             });
                           },
                           child: Text(

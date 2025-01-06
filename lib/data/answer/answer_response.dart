@@ -1,3 +1,5 @@
+import 'package:sponge_app/data/answer/answer_check_response.dart';
+
 class AnswerResponse {
   final int id;
   final String content;
@@ -28,7 +30,6 @@ class AnswerResponse {
       trainerId: json['trainerId'],
     );
   }
-
 }
 
 class TrainerShortResponse {
@@ -55,26 +56,30 @@ class TrainerShortResponse {
       chatCount: json['chatCount'],
     );
   }
-
 }
 
 class AnswerDetailsListResponse {
   final AnswerResponse answerResponse;
   final TrainerShortResponse trainerShortResponse;
   final bool checkAdopt;
+  AnswerCheckResponse answerCheckResponse;
 
   AnswerDetailsListResponse({
     required this.answerResponse,
     required this.trainerShortResponse,
     required this.checkAdopt,
+    required this.answerCheckResponse,
   });
 
   factory AnswerDetailsListResponse.fromJson(Map<String, dynamic> json) {
     return AnswerDetailsListResponse(
       answerResponse: AnswerResponse.fromJson(json['answerResponse']),
       trainerShortResponse:
-      TrainerShortResponse.fromJson(json['trainerShortResponse']),
+          TrainerShortResponse.fromJson(json['trainerShortResponse']),
       checkAdopt: json['checkAdopt'],
+      answerCheckResponse: json['answerCheckResponse'] != null
+          ? AnswerCheckResponse(likeCheck: false)
+          : AnswerCheckResponse(likeCheck: false),
     );
   }
 }
@@ -94,5 +99,4 @@ class AnswerBasicListResponse {
       checkAdopt: json['checkAdopt'],
     );
   }
-
 }
