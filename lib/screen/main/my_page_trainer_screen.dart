@@ -38,7 +38,7 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
   }
 
   Future<void> _initializeData() async {
-    final myInfo = await getMyInfo();
+    final myInfo = await getMyTrainerInfo();
     setState(() {
       trainer = myInfo;
     });

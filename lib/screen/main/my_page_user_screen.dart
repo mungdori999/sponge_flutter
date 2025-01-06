@@ -50,7 +50,7 @@ class _MyPageUserScreenState extends State<MyPageUserScreen> {
   }
 
   Future<void> _initializeData() async {
-        final myInfo = await getMyInfo();
+        final myInfo = await getMyUserInfo();
         final myPet = await getMyPet();
         final myPost = await getMyPost(currentPage);
 

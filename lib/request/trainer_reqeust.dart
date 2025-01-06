@@ -7,7 +7,7 @@ import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 import 'package:sponge_app/token/jwt_token.dart';
 
-Future<Trainer> getMyInfo() async {
+Future<Trainer> getMyTrainerInfo() async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,

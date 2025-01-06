@@ -6,7 +6,7 @@ import 'package:sponge_app/http/url.dart';
 
 
   // Dio를 사용하여 사용자 정보를 가져오는 함수
-  Future<UserResponse> getMyInfo() async {
+  Future<UserResponse> getMyUserInfo() async {
     var _dio = await authDio();
     final url = Uri(
       scheme: scheme,
