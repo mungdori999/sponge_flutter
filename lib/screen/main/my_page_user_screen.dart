@@ -98,6 +98,14 @@ class _MyPageUserScreenState extends State<MyPageUserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

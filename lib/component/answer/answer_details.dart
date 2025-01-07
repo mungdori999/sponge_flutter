@@ -9,6 +9,7 @@ import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/screen/answer/update_answer.dart';
 import 'package:sponge_app/screen/post_screen.dart';
+import 'package:sponge_app/screen/trainer/trainer_individual_profile.dart';
 import 'package:sponge_app/util/convert.dart';
 
 class AnswerDetails extends StatelessWidget {
@@ -43,74 +44,86 @@ class AnswerDetails extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44, // 이미지의 너비
-                        height: 44, // 이미지의 높이
-                        child: ClipOval(
-                          child: answer.trainerShortResponse.profileImgUrl == ''
-                              ? Container(
-                                  width: 70, // 동그라미의 너비
-                                  height: 70, // 동그라미의 높이
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300], // 회색 배경색
-                                    shape: BoxShape.circle, // 동그라미 형태
-                                  ),
-                                  child: Icon(
-                                    Icons.person, // 사람 모양 아이콘
-                                    color: Colors.white, // 아이콘 색상
-                                    size: 30, // 아이콘 크기
-                                  ),
-                                )
-                              : Image.network(
-                                  answer.trainerShortResponse.profileImgUrl,
-                                  fit: BoxFit.cover, // 이미지 크기 조정
-                                ),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrainerIndividualProfile(
+                            id: answer.trainerShortResponse.id
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${answer.trainerShortResponse.name} 훈련사님',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w700),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44, // 이미지의 너비
+                          height: 44, // 이미지의 높이
+                          child: ClipOval(
+                            child: answer.trainerShortResponse.profileImgUrl == ''
+                                ? Container(
+                                    width: 70, // 동그라미의 너비
+                                    height: 70, // 동그라미의 높이
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300], // 회색 배경색
+                                      shape: BoxShape.circle, // 동그라미 형태
+                                    ),
+                                    child: Icon(
+                                      Icons.person, // 사람 모양 아이콘
+                                      color: Colors.white, // 아이콘 색상
+                                      size: 30, // 아이콘 크기
+                                    ),
+                                  )
+                                : Image.network(
+                                    answer.trainerShortResponse.profileImgUrl,
+                                    fit: BoxFit.cover, // 이미지 크기 조정
+                                  ),
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                '채택된 답변 ${answer.trainerShortResponse.adoptCount}건',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: mediumGrey,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${answer.trainerShortResponse.name} 훈련사님',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w700),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  '채택된 답변 ${answer.trainerShortResponse.adoptCount}건',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: mediumGrey,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                '|',
-                                style: TextStyle(color: mainGrey, fontSize: 12),
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                '1:1상담 ${answer.trainerShortResponse.chatCount}회',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: mediumGrey,
+                                SizedBox(
+                                  width: 8,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
+                                Text(
+                                  '|',
+                                  style: TextStyle(color: mainGrey, fontSize: 12),
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  '1:1상담 ${answer.trainerShortResponse.chatCount}회',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: mediumGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 4,

@@ -35,7 +35,35 @@ Future<List<AnswerDetailsListResponse>> getAnswerList(int postId) async {
     throw Exception('Error occurred: $e');
   }
 }
+Future<List<AnswerBasicListResponse>> getAnswerListByTrainerId(int trainerId,int page) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/answer/trainer',
+    queryParameters: {
+      'trainerId': trainerId.toString(),
+      'page': page.toString(),
+    },
+  ).toString();
 
+  try {
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final List<dynamic> data = response.data;
+      return data
+          .map((item) => AnswerBasicListResponse.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
 Future<List<AnswerBasicListResponse>> getMyAnswer(int page) async {
   var _dio = await authDio();
   final url = Uri(

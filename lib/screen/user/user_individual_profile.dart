@@ -93,6 +93,14 @@ class _UserIndividualProfileState extends State<UserIndividualProfile> {
 
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: ProfileTop(),
@@ -100,79 +108,81 @@ class _UserIndividualProfileState extends State<UserIndividualProfile> {
         scrolledUnderElevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  if (user != null) UserProfile(user: user!),
-                  if (petList.isNotEmpty)
-                    PetCardList(
-                      petList: petList,
-                      myPage: false,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    if (user != null) UserProfile(user: user!),
+                    if (petList.isNotEmpty)
+                      PetCardList(
+                        petList: petList,
+                        myPage: false,
+                      )
+                  ],
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: 8,
+                color: lightGrey,
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '활동 내역',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                    ...postList
+                        .map(
+                          (post) => GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostScreen(id: post.id),
+                          ),
+                        ),
+                        child: Card(
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: HomePostCard(post: post),
+                          ),
+                        ),
+                      ),
                     )
-                ],
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 8,
-              color: lightGrey,
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '활동 내역',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  ...postList
-                      .map(
-                        (post) => GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostScreen(id: post.id),
+                        .toList(),
+                    if (isLoading)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
                         ),
                       ),
-                      child: Card(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: HomePostCard(post: post),
+                    if (!hasMorePosts)
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text('더 이상 게시글이 없습니다.'),
                         ),
                       ),
-                    ),
-                  )
-                      .toList(),
-                  if (isLoading)
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  if (!hasMorePosts)
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text('더 이상 게시글이 없습니다.'),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
