@@ -9,7 +9,7 @@ import 'package:sponge_app/request/user_request.dart';
 import 'package:sponge_app/screen/settings_screen.dart';
 import 'package:sponge_app/screen/trainer/craete/trainer_register.dart';
 import 'package:sponge_app/screen/trainer/update/trainer_update.dart';
-import 'package:sponge_app/screen/user/user_update.dart';
+import 'package:sponge_app/screen/user/update_user.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 
 class MyPageTop extends StatelessWidget {
@@ -49,7 +49,8 @@ class MyPageTop extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UserUpdate(
+                  builder: (context) => UpdateUser(
+                    user: user,
                   ),
                 ),
               );
