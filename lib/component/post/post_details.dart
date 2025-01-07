@@ -7,6 +7,7 @@ import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/post/post_check_response.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/request/post_request.dart';
+import 'package:sponge_app/screen/user/user_individual_profile.dart';
 import 'package:sponge_app/screen/write/select_category.dart';
 import 'package:sponge_app/util/convert.dart';
 
@@ -68,107 +69,119 @@ class PostDetails extends StatelessWidget {
           SizedBox(
             height: 8,
           ),
-          Row(
-            children: [
-              Container(
-                width: 44, // 이미지의 너비
-                height: 44, // 이미지의 높이
-                child: ClipOval(
-                  child: Image.network(
-                    'https://media.istockphoto.com/id/1482199015/ko/%EC%82%AC%EC%A7%84/%ED%96%89%EB%B3%B5%ED%95%9C-%EA%B0%95%EC%95%84%EC%A7%80-%EC%9B%A8%EC%9D%BC%EC%8A%A4-%EC%96%B4-%EC%BD%94%EA%B8%B0-14-%EC%A3%BC%EB%A0%B9-%EA%B0%9C%EA%B0%80-%EC%9C%99%ED%81%AC%ED%95%98%EA%B3%A0-%ED%97%90%EB%96%A1%EC%9D%B4%EA%B3%A0-%ED%9D%B0%EC%83%89%EC%97%90-%EA%B3%A0%EB%A6%BD%EB%90%98%EC%96%B4-%EC%95%89%EC%95%84-%EC%9E%88%EC%8A%B5%EB%8B%88%EB%8B%A4.jpg?s=612x612&w=0&k=20&c=vW29tbABUS2fEJvPi8gopZupfTKErCDMfeq5rrOaAME=',
-                    fit: BoxFit.cover, // 이미지 크기 조정
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserIndividualProfile(
+                    id: post.userId,
                   ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.pet.name,
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 80,
-                    child: Row(
-                      children: [
-                        Text(
-                          post.pet.breed,
-                          style: TextStyle(fontSize: 12, color: mainGrey),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '·', // 가운데 점
-                          style: TextStyle(
-                            fontSize: 16, // 점 크기
-                            color: mainGrey, // 점 색상
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          Gender.getDescriptionByCode(post.pet.gender),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: mainGrey,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '·', // 가운데 점
-                          style: TextStyle(
-                            fontSize: 16, // 점 크기
-                            color: mainGrey, // 점 색상
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '${post.pet.age}살',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: mainGrey,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '·', // 가운데 점
-                          style: TextStyle(
-                            fontSize: 16, // 점 크기
-                            color: mainGrey, // 점 색상
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '${post.pet.weight}kg',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: mainGrey,
-                          ),
-                        ),
-                        Spacer(),
-                        Text(
-                          Convert.convertTimeAgo(post.createdAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: mainGrey,
-                          ),
-                        ),
-                      ],
+              );
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 44, // 이미지의 너비
+                  height: 44, // 이미지의 높이
+                  child: ClipOval(
+                    child: Image.network(
+                      'https://media.istockphoto.com/id/1482199015/ko/%EC%82%AC%EC%A7%84/%ED%96%89%EB%B3%B5%ED%95%9C-%EA%B0%95%EC%95%84%EC%A7%80-%EC%9B%A8%EC%9D%BC%EC%8A%A4-%EC%96%B4-%EC%BD%94%EA%B8%B0-14-%EC%A3%BC%EB%A0%B9-%EA%B0%9C%EA%B0%80-%EC%9C%99%ED%81%AC%ED%95%98%EA%B3%A0-%ED%97%90%EB%96%A1%EC%9D%B4%EA%B3%A0-%ED%9D%B0%EC%83%89%EC%97%90-%EA%B3%A0%EB%A6%BD%EB%90%98%EC%96%B4-%EC%95%89%EC%95%84-%EC%9E%88%EC%8A%B5%EB%8B%88%EB%8B%A4.jpg?s=612x612&w=0&k=20&c=vW29tbABUS2fEJvPi8gopZupfTKErCDMfeq5rrOaAME=',
+                      fit: BoxFit.cover, // 이미지 크기 조정
                     ),
                   ),
-                ],
-              )
-            ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.pet.name,
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width - 80,
+                      child: Row(
+                        children: [
+                          Text(
+                            post.pet.breed,
+                            style: TextStyle(fontSize: 12, color: mainGrey),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '·', // 가운데 점
+                            style: TextStyle(
+                              fontSize: 16, // 점 크기
+                              color: mainGrey, // 점 색상
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            Gender.getDescriptionByCode(post.pet.gender),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: mainGrey,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '·', // 가운데 점
+                            style: TextStyle(
+                              fontSize: 16, // 점 크기
+                              color: mainGrey, // 점 색상
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '${post.pet.age}살',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: mainGrey,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '·', // 가운데 점
+                            style: TextStyle(
+                              fontSize: 16, // 점 크기
+                              color: mainGrey, // 점 색상
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '${post.pet.weight}kg',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: mainGrey,
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            Convert.convertTimeAgo(post.createdAt),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: mainGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           SizedBox(
             height: 8,

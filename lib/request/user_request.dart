@@ -4,6 +4,30 @@ import 'package:sponge_app/http/auth_dio.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 
+
+Future<UserResponse> getUserById(int id) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/user/${id}',
+  ).toString();
+  try {
+    // GET 요청 보내기
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final dynamic data = response.data;
+      return UserResponse.fromJson(data);
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
 // Dio를 사용하여 사용자 정보를 가져오는 함수
 Future<UserResponse> getMyUserInfo() async {
   var _dio = await authDio();

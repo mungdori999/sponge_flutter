@@ -8,8 +8,9 @@ import 'package:sponge_app/screen/pet/update_pet.dart';
 
 class PetCardList extends StatefulWidget {
   final List<Pet> petList;
+  final bool myPage;
 
-  const PetCardList({super.key, required this.petList});
+  const PetCardList({super.key, required this.petList, required this.myPage});
 
   @override
   State<PetCardList> createState() => _PetCardListState();
@@ -136,32 +137,36 @@ class _PetCardListState extends State<PetCardList> {
             ],
           ),
         ),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UpdatePet(pet: widget.petList[_currentIndex],),
+        if (widget.myPage)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpdatePet(
+                      pet: widget.petList[_currentIndex],
+                    ),
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero, // 추가 여백 없애기
+                  minimumSize: Size.zero, // 최소 크기 설정
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 터치 영역 최소화
+                ),
+                child: Text(
+                  '수정하기',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: mediumGrey,
+                  ),
                 ),
               ),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero, // 추가 여백 없애기
-                minimumSize: Size.zero,  // 최소 크기 설정
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 터치 영역 최소화
-              ),
-              child: Text(
-                '수정하기',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: mediumGrey,
-                ),
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        if(!widget.myPage)
+          SizedBox(height: 8,),
         if (widget.petList.length > 1)
           SmoothPageIndicator(
             controller: _controller, // PageController 연결
@@ -175,47 +180,48 @@ class _PetCardListState extends State<PetCardList> {
         SizedBox(
           height: 8,
         ),
-        OutlinedButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RegisterPet(),
+        if (widget.myPage)
+          OutlinedButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegisterPet(),
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: mainYellow, width: 0.5),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              minimumSize: Size(0, 0),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 20, // 동그라미의 너비
+                  height: 20, // 동그라미의 높이
+                  decoration: BoxDecoration(
+                    color: mainYellow, // 회색 배경색
+                    shape: BoxShape.circle, // 동그라미 형태
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  '반려견 추가하기',
+                  style: TextStyle(
+                      color: mainYellow,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
             ),
           ),
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: mainYellow, width: 0.5),
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            minimumSize: Size(0, 0),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 20, // 동그라미의 너비
-                height: 20, // 동그라미의 높이
-                decoration: BoxDecoration(
-                  color: mainYellow, // 회색 배경색
-                  shape: BoxShape.circle, // 동그라미 형태
-                ),
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Text(
-                '반려견 추가하기',
-                style: TextStyle(
-                    color: mainYellow,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

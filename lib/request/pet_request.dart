@@ -4,7 +4,7 @@ import 'package:sponge_app/http/auth_dio.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 
-Future<List<Pet>> getPetByUserId(int userId) async {
+Future<List<Pet>> getPetListByUserId(int userId) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
@@ -31,7 +31,6 @@ Future<List<Pet>> getPetByUserId(int userId) async {
     throw Exception('Error occurred: $e');
   }
 }
-
 Future<List<Pet>> getMyPet() async {
   var _dio = await authDio();
   final url = Uri(
