@@ -8,6 +8,7 @@ class Trainer {
   final String profileImgUrl;
   final String content;
   final int adoptCount; // 채택 답변 수
+  final double score; // 채택 답변 수
   final int chatCount; // 1대1 채팅 수
   final List<History> historyList;
   final List<TrainerAddress> trainerAddressList;
@@ -22,6 +23,7 @@ class Trainer {
     required this.profileImgUrl,
     required this.content,
     required this.adoptCount,
+    required this.score,
     required this.chatCount,
     required this.historyList,
     required this.trainerAddressList,
@@ -38,6 +40,7 @@ class Trainer {
       profileImgUrl: data['profileImgUrl'] ?? '',
       content: data['content'] ?? '',
       adoptCount: data['adoptCount'] ?? 0,
+      score: data['score'] ?? 0,
       chatCount: data['chatCount'] ?? 0,
       historyList: (data['historyList'] as List<dynamic>? ?? [])
           .map((item) => History.fromJson(item))

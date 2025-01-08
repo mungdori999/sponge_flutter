@@ -5,17 +5,21 @@ import 'package:sponge_app/component/trainer/trainer_profile_answer.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_history.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_review.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/review/review_check_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
+import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/request/review_request.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
 class TrainerIndividualProfile extends StatefulWidget {
   final int id;
+  final LoginAuth loginAuth;
 
-  const TrainerIndividualProfile({super.key, required this.id});
+  const TrainerIndividualProfile(
+      {super.key, required this.id, required this.loginAuth});
 
   @override
   State<TrainerIndividualProfile> createState() =>
@@ -163,9 +167,14 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                         TextButton(
                           onPressed: () async {
                             _initPage();
-                            reviewCheckResponse =
-                                await getMyReviewCheck(trainer!.id);
-
+                            if (widget.loginAuth.loginType ==
+                                LoginType.USER.value) {
+                              reviewCheckResponse =
+                                  await getMyReviewCheck(trainer!.id);
+                            } else {
+                              reviewCheckResponse =
+                                  new ReviewCheckResponse(reviewCheck: true);
+                            }
                             setState(() {
                               _selectedIndex = 2; // 두 번째 버튼 선택 시
                             });
@@ -227,7 +236,9 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
               if (_selectedIndex == 2)
                 TrainerProfileReview(
                   reviewCheckResponse: reviewCheckResponse!,
+                  trainerId: trainer!.id,
                   name: trainer!.name,
+                  score: trainer!.score,
                 ),
               if (_selectedIndex == 3)
                 Column(

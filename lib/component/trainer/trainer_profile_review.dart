@@ -5,10 +5,12 @@ import 'package:sponge_app/screen/review/write_review.dart';
 
 class TrainerProfileReview extends StatefulWidget {
   final ReviewCheckResponse reviewCheckResponse;
+  final int trainerId;
   final String name;
+  final double score;
 
   const TrainerProfileReview(
-      {super.key, required this.reviewCheckResponse, required this.name});
+      {super.key, required this.reviewCheckResponse, required this.name, required this.trainerId, required this.score});
 
   @override
   State<TrainerProfileReview> createState() => _TrainerProfileReviewState();
@@ -64,7 +66,7 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WriteReview(),
+                          builder: (context) => WriteReview(trainerId: widget.trainerId,),
                         ),
                       );
                     },
@@ -88,7 +90,7 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
           Row(
             children: [
               Text(
-                '0.0',
+                widget.score.toString(),
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.w700),
               ),

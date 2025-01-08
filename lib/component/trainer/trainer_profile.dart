@@ -191,7 +191,7 @@ class TrainerProfile extends StatelessWidget {
                       children: [
                         Icon(Icons.star, color: mainYellow, size: 18),
                         Text(
-                          '0.0',
+                          trainer.score.toString(),
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700),

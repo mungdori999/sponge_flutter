@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/top/write_top.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/data/review/review_create.dart';
+import 'package:sponge_app/request/review_request.dart';
 
 class WriteReview extends StatefulWidget {
-  const WriteReview({super.key});
+  final int trainerId;
+
+  const WriteReview({super.key, required this.trainerId});
 
   @override
   State<WriteReview> createState() => _WriteReviewState();
@@ -54,8 +58,13 @@ class _WriteReviewState extends State<WriteReview> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: OutlinedButton(
             onPressed: enabled
-                ? () {
-                    // 완료 버튼 동작
+                ? () async {
+                    ReviewCreate reviewCreate = new ReviewCreate(
+                        trainerId: widget.trainerId,
+                        score: _rating,
+                        content: _contentController.text);
+                    await createReview(reviewCreate);
+                    Navigator.pop(context);
                   }
                 : null,
             style: OutlinedButton.styleFrom(
@@ -66,7 +75,7 @@ class _WriteReviewState extends State<WriteReview> {
               side: BorderSide.none,
               minimumSize: const Size(double.infinity, 48),
             ),
-            child:  Text(
+            child: Text(
               '완료',
               style: TextStyle(
                 color: enabled ? Colors.white : mainGrey,

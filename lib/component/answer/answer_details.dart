@@ -50,7 +50,8 @@ class AnswerDetails extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => TrainerIndividualProfile(
-                            id: answer.trainerShortResponse.id
+                            id: answer.trainerShortResponse.id,
+                            loginAuth: loginAuth,
                           ),
                         ),
                       );
