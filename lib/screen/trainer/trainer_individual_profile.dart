@@ -3,10 +3,13 @@ import 'package:sponge_app/component/top/profile_top.dart';
 import 'package:sponge_app/component/trainer/trainer_profile.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_answer.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_history.dart';
+import 'package:sponge_app/component/trainer/trainer_profile_review.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
+import 'package:sponge_app/data/review/review_check_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
+import 'package:sponge_app/request/review_request.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
 class TrainerIndividualProfile extends StatefulWidget {
@@ -23,6 +26,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
   Trainer? trainer;
   int _selectedIndex = 1;
   List<AnswerBasicListResponse> answerList = [];
+  ReviewCheckResponse? reviewCheckResponse;
   final ScrollController _scrollController = ScrollController();
   int currentPage = 0;
   bool isLoading = false;
@@ -139,7 +143,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                             '경력',
                             style: TextStyle(
                               color:
-                              _selectedIndex == 1 ? Colors.black : mainGrey,
+                                  _selectedIndex == 1 ? Colors.black : mainGrey,
                               fontSize: 16,
                             ),
                           ),
@@ -157,7 +161,11 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                     child: Column(
                       children: [
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            _initPage();
+                            reviewCheckResponse =
+                                await getMyReviewCheck(trainer!.id);
+
                             setState(() {
                               _selectedIndex = 2; // 두 번째 버튼 선택 시
                             });
@@ -166,7 +174,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                             '리뷰',
                             style: TextStyle(
                               color:
-                              _selectedIndex == 2 ? Colors.black : mainGrey,
+                                  _selectedIndex == 2 ? Colors.black : mainGrey,
                               fontSize: 16,
                             ),
                           ),
@@ -184,7 +192,8 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                         TextButton(
                           onPressed: () async {
                             _initPage();
-                            answerList = await getAnswerListByTrainerId(widget.id,currentPage);
+                            answerList = await getAnswerListByTrainerId(
+                                widget.id, currentPage);
                             setState(() {
                               currentPage++;
                               _selectedIndex = 3; // 세 번째 버튼 선택 시
@@ -194,7 +203,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                             '활동내역',
                             style: TextStyle(
                               color:
-                              _selectedIndex == 3 ? Colors.black : mainGrey,
+                                  _selectedIndex == 3 ? Colors.black : mainGrey,
                               fontSize: 16,
                             ),
                           ),
@@ -214,6 +223,11 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
               if (_selectedIndex == 1)
                 TrainerProfileHistory(
                   historyList: trainer!.historyList,
+                ),
+              if (_selectedIndex == 2)
+                TrainerProfileReview(
+                  reviewCheckResponse: reviewCheckResponse!,
+                  name: trainer!.name,
                 ),
               if (_selectedIndex == 3)
                 Column(

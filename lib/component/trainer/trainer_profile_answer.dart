@@ -4,21 +4,16 @@ import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/util/convert.dart';
 
-class TrainerProfileAnswer extends StatefulWidget {
+class TrainerProfileAnswer extends StatelessWidget {
   final List<AnswerBasicListResponse> answerList;
 
   const TrainerProfileAnswer({super.key, required this.answerList});
 
   @override
-  State<TrainerProfileAnswer> createState() => _TrainerProfileAnswerState();
-}
-
-class _TrainerProfileAnswerState extends State<TrainerProfileAnswer> {
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ...widget.answerList
+        ...answerList
             .map(
               (answer) => GestureDetector(
                 onTap: () => Navigator.push(
