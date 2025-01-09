@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/review/review_check_response.dart';
+import 'package:sponge_app/data/review/review_response.dart';
 import 'package:sponge_app/screen/review/write_review.dart';
 
 class TrainerProfileReview extends StatefulWidget {
@@ -8,9 +9,10 @@ class TrainerProfileReview extends StatefulWidget {
   final int trainerId;
   final String name;
   final double score;
+  final List<ReviewResponse> reviewList;
 
   const TrainerProfileReview(
-      {super.key, required this.reviewCheckResponse, required this.name, required this.trainerId, required this.score});
+      {super.key, required this.reviewCheckResponse, required this.name, required this.trainerId, required this.score, required this.reviewList});
 
   @override
   State<TrainerProfileReview> createState() => _TrainerProfileReviewState();
@@ -33,7 +35,7 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
               ),
               const SizedBox(width: 8),
               Text(
-                '1',
+                widget.reviewList.length.toString(),
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w700, color: mainGrey),
               ),
@@ -95,9 +97,30 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
                     fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(width: 8),
-              HalfStar(size: 20),
+              ...List.generate(5, (index) {
+                if (index < widget.score.floor()) {
+                  // 정수 부분: 꽉 찬 별
+                  return Icon(
+                    Icons.star,
+                    color: mainYellow,
+                    size: 25,
+                  );
+                } else if (index < widget.score && widget.score - index >= 0.5) {
+                  // 소수 부분: 반 별
+                  return HalfStar();
+                } else {
+                  // 나머지: 빈 별
+                  return Icon(
+                    Icons.star,
+                    color: lightGrey,
+                    size: 25,
+                  );
+                }
+              }),
             ],
           ),
+          SizedBox(height: 8,),
+
         ],
       ),
     );
@@ -107,7 +130,7 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
 class HalfStar extends StatelessWidget {
   final double size;
 
-  const HalfStar({this.size = 24.0, super.key});
+  const HalfStar({this.size = 25.0, super.key});
 
   @override
   Widget build(BuildContext context) {

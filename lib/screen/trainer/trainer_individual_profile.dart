@@ -8,6 +8,7 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/review/review_check_response.dart';
+import 'package:sponge_app/data/review/review_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
@@ -31,6 +32,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
   int _selectedIndex = 1;
   List<AnswerBasicListResponse> answerList = [];
   ReviewCheckResponse? reviewCheckResponse;
+  List<ReviewResponse> reviewList = [];
   final ScrollController _scrollController = ScrollController();
   int currentPage = 0;
   bool isLoading = false;
@@ -175,7 +177,10 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                               reviewCheckResponse =
                                   new ReviewCheckResponse(reviewCheck: true);
                             }
+                            reviewList = await getReviewListByTrainerId(
+                                trainer!.id, currentPage);
                             setState(() {
+                              currentPage++;
                               _selectedIndex = 2; // 두 번째 버튼 선택 시
                             });
                           },
@@ -239,6 +244,7 @@ class _TrainerIndividualProfileState extends State<TrainerIndividualProfile> {
                   trainerId: trainer!.id,
                   name: trainer!.name,
                   score: trainer!.score,
+                  reviewList: reviewList,
                 ),
               if (_selectedIndex == 3)
                 Column(

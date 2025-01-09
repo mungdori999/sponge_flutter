@@ -20,7 +20,7 @@ class _WriteReviewState extends State<WriteReview> {
   int _rating = 5; // 현재 별점 (0 ~ 5)
   void _updateRating(int index) {
     setState(() {
-      _rating = index; // 정수형 별점 업데이트
+      _rating = index;
     });
   }
 
