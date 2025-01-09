@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/component/trainer/trainer_profile.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_answer.dart';
 import 'package:sponge_app/component/trainer/trainer_profile_history.dart';
+import 'package:sponge_app/component/trainer/trainer_profile_review.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
+import 'package:sponge_app/data/review/review_check_response.dart';
+import 'package:sponge_app/data/review/review_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
+import 'package:sponge_app/request/review_request.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
 class MyPageTrainerScreen extends StatefulWidget {
@@ -19,6 +23,7 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
   Trainer? trainer;
   int _selectedIndex = 1;
   List<AnswerBasicListResponse> answerList = [];
+  List<ReviewResponse> reviewList = [];
   final ScrollController _scrollController = ScrollController();
   int currentPage = 0;
   bool isLoading = false;
@@ -147,8 +152,11 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async{
+                          _initPage();
+                          reviewList = await getMyReviewByTrainerId(currentPage);
                           setState(() {
+                            currentPage++;
                             _selectedIndex = 2; // 두 번째 버튼 선택 시
                           });
                         },
@@ -205,6 +213,13 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
               TrainerProfileHistory(
                 historyList: trainer!.historyList,
               ),
+            if (_selectedIndex == 2)
+              TrainerProfileReview(
+                  reviewCheckResponse:  new ReviewCheckResponse(reviewCheck: true),
+                  name: trainer!.name,
+                  trainerId: trainer!.id,
+                  score: trainer!.score,
+                  reviewList: reviewList),
             if (_selectedIndex == 3)
               Column(
                 children: [
@@ -225,5 +240,4 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
       ),
     );
   }
-
 }

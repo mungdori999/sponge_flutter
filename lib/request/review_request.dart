@@ -60,6 +60,32 @@ Future<List<ReviewResponse>> getReviewListByTrainerId(
     throw Exception('Error occurred: $e');
   }
 }
+Future<List<ReviewResponse>> getMyReviewByTrainerId(int page) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/review/my_info/trainer',
+    queryParameters: {
+      'page': page.toString(),
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final List<dynamic> data = response.data;
+      return data.map((item) => ReviewResponse.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
 
 Future<void> createReview(ReviewCreate reviewCreate) async {
   var _dio = await authDio();

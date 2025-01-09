@@ -12,15 +12,18 @@ class TrainerProfileReview extends StatefulWidget {
   final List<ReviewResponse> reviewList;
 
   const TrainerProfileReview(
-      {super.key, required this.reviewCheckResponse, required this.name, required this.trainerId, required this.score, required this.reviewList});
+      {super.key,
+      required this.reviewCheckResponse,
+      required this.name,
+      required this.trainerId,
+      required this.score,
+      required this.reviewList});
 
   @override
   State<TrainerProfileReview> createState() => _TrainerProfileReviewState();
 }
 
 class _TrainerProfileReviewState extends State<TrainerProfileReview> {
-
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -52,12 +55,12 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
                     Text(
                       '${widget.name} 훈련사님에게',
                       style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                     const Text(
                       '리뷰를 남겨보세요',
                       style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -68,7 +71,9 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WriteReview(trainerId: widget.trainerId,),
+                          builder: (context) => WriteReview(
+                            trainerId: widget.trainerId,
+                          ),
                         ),
                       );
                     },
@@ -93,8 +98,8 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
             children: [
               Text(
                 widget.score.toString(),
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(width: 8),
               ...List.generate(5, (index) {
@@ -105,7 +110,8 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
                     color: mainYellow,
                     size: 25,
                   );
-                } else if (index < widget.score && widget.score - index >= 0.5) {
+                } else if (index < widget.score &&
+                    widget.score - index >= 0.5) {
                   // 소수 부분: 반 별
                   return HalfStar();
                 } else {
@@ -119,8 +125,88 @@ class _TrainerProfileReviewState extends State<TrainerProfileReview> {
               }),
             ],
           ),
-          SizedBox(height: 8,),
-
+          SizedBox(
+            height: 8,
+          ),
+          ...widget.reviewList
+              .map(
+                (review) => Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: lightGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  color: mainYellow,
+                                  size: 25,
+                                ),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                Text(
+                                  review.score.toString(),
+                                  style: TextStyle(
+                                      fontSize: 16, fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 4,
+                            ),
+                            Text(
+                              review.content,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: darkGrey,
+                              ),
+                            ),
+                            SizedBox(height: 8,),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 30, // 동그라미의 너비
+                                  height: 30, // 동그라미의 높이
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400], // 회색 배경색
+                                    shape: BoxShape.circle, // 동그라미 형태
+                                  ),
+                                  child: Icon(
+                                    Icons.person, // 사람 모양 아이콘
+                                    color: Colors.white, // 아이콘 색상
+                                    size: 20, // 아이콘 크기
+                                  ),
+                                ),
+                                SizedBox(width: 8,),
+                                Text(
+                                  '${review.userName[0]}${'*' * (review.userName.length - 1)}', // 첫 글자 + '*' 반복
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: mainGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12,),
+                  ],
+                ),
+              )
+              .toList()
         ],
       ),
     );
