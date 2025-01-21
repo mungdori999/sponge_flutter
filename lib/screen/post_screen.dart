@@ -93,7 +93,7 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const ScreenTop(),
+        title: ScreenTop(),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
       ),
