@@ -5,8 +5,8 @@ class PostResponse {
   final String title;
   final String content;
   final String duration;
-  final DateTime createdAt;
-  final DateTime modifiedAt;
+  final int createdAt;
+  final int modifiedAt;
   final int likeCount;
   final int answerCount;
   final int userId;
@@ -37,8 +37,8 @@ class PostResponse {
       title: json['title'],
       content: json['content'],
       duration: json['duration'],
-      createdAt: DateTime.parse(json['createdAt']),
-      modifiedAt: DateTime.parse(json['modifiedAt']),
+      createdAt: json['createdAt'],
+      modifiedAt: json['modifiedAt'],
       likeCount: json['likeCount'],
       answerCount: json['answerCount'],
       userId: json['userId'],

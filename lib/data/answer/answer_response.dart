@@ -4,8 +4,8 @@ class AnswerResponse {
   final int id;
   final String content;
   final int likeCount;
-  final DateTime createdAt;
-  final DateTime modifiedAt;
+  final int createdAt;
+  final int modifiedAt;
   final int postId;
   final int trainerId;
 
@@ -24,8 +24,8 @@ class AnswerResponse {
       id: json['id'],
       content: json['content'],
       likeCount: json['likeCount'],
-      createdAt: DateTime.parse(json['createdAt']),
-      modifiedAt: DateTime.parse(json['modifiedAt']),
+      createdAt: json['createdAt'],
+      modifiedAt: json['modifiedAt'],
       postId: json['postId'],
       trainerId: json['trainerId'],
     );

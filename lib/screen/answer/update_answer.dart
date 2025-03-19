@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/const/category_code.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
-import 'package:sponge_app/data/answer/answer_create.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
 import 'package:sponge_app/data/answer/answer_update.dart';
 import 'package:sponge_app/data/post/post.dart';

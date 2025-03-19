@@ -2,7 +2,7 @@ class Post {
   final int id;
   final String title;
   final String content;
-  final DateTime createdAt;
+  final int createdAt;
   final int likeCount;
   final int answerCount;
   final int userId;
@@ -25,7 +25,7 @@ class Post {
       id: json['id'],
       title: json['title'],
       content: json['content'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: json['createdAt'],
       likeCount: json['likeCount'],
       answerCount: json['answerCount'],
       userId: json['userId'],

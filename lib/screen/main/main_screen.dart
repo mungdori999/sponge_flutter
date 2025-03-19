@@ -50,6 +50,8 @@ class MainScreen extends StatelessWidget {
         return CommonTop();
       case 3:
         return MyPageTop();
+      case 4:
+        return HomeTop();
       default:
         return Container();
     }

@@ -89,6 +89,7 @@ Future<void> createTrainer(TrainerCreate trainerCreate) async {
 
 Future<void> updateTrainer(int id, TrainerCreate trainerCreate) async {
   var _dio = await authDio();
+  final storage = new FlutterSecureStorage();
   final url = Uri(
     scheme: scheme,
     host: host,
@@ -99,6 +100,17 @@ Future<void> updateTrainer(int id, TrainerCreate trainerCreate) async {
   try {
     final response = await _dio.patch(url, data: trainerCreate.toJson());
     // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      final newAccessToken = response.headers.value('authorization');
+      final responseBody = response.data;
+      final newRefreshToken = responseBody[JwtToken.refreshToken.key];
+      // 새 토큰 저장
+      await storage.write(key: JwtToken.accessToken.key, value: newAccessToken);
+      await storage.write(key: JwtToken.refreshToken.key, value: newRefreshToken);
+
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
   } catch (e) {
     throw Exception('Error occurred: $e');
   }
