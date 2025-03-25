@@ -36,6 +36,10 @@ class _BottomState extends State<Bottom> {
           label: '내진단',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.message_outlined),
+          label: '채팅',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'MY',
         ),

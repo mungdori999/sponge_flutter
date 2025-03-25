@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_app/component/bottom/bottom.dart';
+import 'package:sponge_app/component/top/chat_top.dart';
 import 'package:sponge_app/component/top/common_top.dart';
 import 'package:sponge_app/component/top/home_top.dart';
 import 'package:sponge_app/component/top/my_page_top.dart';
 import 'package:sponge_app/component/top/post_list_top.dart';
+import 'package:sponge_app/screen/chat/chat_room_screen.dart';
+import 'package:sponge_app/screen/chat/chat_screen.dart';
 import 'package:sponge_app/screen/main/home_screen.dart';
 import 'package:sponge_app/screen/main/select_my_activity.dart';
 import 'package:sponge_app/screen/main/post_list_screen.dart';
@@ -16,6 +19,7 @@ class MainScreen extends StatelessWidget {
     HomeScreen(),
     PostListScreen(),
     SelectMyActivity(),
+    ChatRoomScreen(),
     SelectMyPage(),
   ];
 
@@ -49,7 +53,7 @@ class MainScreen extends StatelessWidget {
       case 2:
         return CommonTop();
       case 3:
-        return MyPageTop();
+        return ChatTop();
       case 4:
         return HomeTop();
       default:
