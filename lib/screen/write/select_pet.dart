@@ -79,7 +79,7 @@ class _SelectPetState extends State<SelectPet> {
                 GestureDetector(
                   onTap: () {
                     Provider.of<PageIndexProvider>(context, listen: false)
-                        .updateIndex(3);
+                        .updateIndex(4);
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       '/',

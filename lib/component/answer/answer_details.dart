@@ -4,9 +4,11 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/answer/adopt_answer_create.dart';
 import 'package:sponge_app/data/answer/answer_response.dart';
+import 'package:sponge_app/data/chat/chat_room_create.dart';
 import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
+import 'package:sponge_app/request/chat_room_request.dart';
 import 'package:sponge_app/screen/answer/update_answer.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/screen/trainer/trainer_individual_profile.dart';
@@ -45,7 +47,7 @@ class AnswerDetails extends StatelessWidget {
               child: Column(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -62,7 +64,8 @@ class AnswerDetails extends StatelessWidget {
                           width: 44, // 이미지의 너비
                           height: 44, // 이미지의 높이
                           child: ClipOval(
-                            child: answer.trainerShortResponse.profileImgUrl == ''
+                            child: answer.trainerShortResponse.profileImgUrl ==
+                                    ''
                                 ? Container(
                                     width: 70, // 동그라미의 너비
                                     height: 70, // 동그라미의 높이
@@ -107,7 +110,8 @@ class AnswerDetails extends StatelessWidget {
                                 ),
                                 Text(
                                   '|',
-                                  style: TextStyle(color: mainGrey, fontSize: 12),
+                                  style:
+                                      TextStyle(color: mainGrey, fontSize: 12),
                                 ),
                                 SizedBox(
                                   width: 8,
@@ -317,7 +321,10 @@ class AnswerDetails extends StatelessWidget {
                               ? MediaQuery.of(context).size.width / 1.2
                               : MediaQuery.of(context).size.width / 2.5,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              createChatRoom(new ChatRoomCreate(
+                                  trainerId: answer.trainerShortResponse.id));
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: answer.checkAdopt
                                   ? mainYellow
