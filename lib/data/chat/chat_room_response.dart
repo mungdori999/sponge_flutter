@@ -1,4 +1,5 @@
 class ChatRoomResponse {
+  final int id;
   final String name;
   final String imgUrl;
   final String loginType;
@@ -6,6 +7,7 @@ class ChatRoomResponse {
   final int createdAt;
 
   ChatRoomResponse({
+    required this.id,
     required this.name,
     required this.imgUrl,
     required this.loginType,
@@ -16,6 +18,7 @@ class ChatRoomResponse {
   // JSON에서 객체로 변환하는 factory constructor
   factory ChatRoomResponse.fromJson(Map<String, dynamic> json) {
     return ChatRoomResponse(
+      id: json['id'] as int,
       name: json['name'] as String,
       imgUrl: json['imgUrl'] as String,
       loginType: json['loginType'] as String,
@@ -27,6 +30,7 @@ class ChatRoomResponse {
   // 객체를 JSON으로 변환하는 메서드
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'imgUrl': imgUrl,
       'loginType': loginType,

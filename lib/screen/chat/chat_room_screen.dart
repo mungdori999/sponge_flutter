@@ -3,6 +3,7 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
 import 'package:sponge_app/data/chat/chat_room_response.dart';
 import 'package:sponge_app/request/chat_room_request.dart';
+import 'package:sponge_app/screen/chat/chat_screen.dart';
 import 'package:sponge_app/util/convert.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -86,57 +87,77 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ...chatRoomList.map(
               (chatRoom) => Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              Image.asset('asset/img/basic_pet.png', width: 50),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 12,
-                          ),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    chatRoom.loginType ==
-                                            LoginType.TRAINER.loginType
-                                        ? chatRoom.name + " 훈련사님"
-                                        : chatRoom.name + " 견주님",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                chatRoom.lastMsg,
-                                style: TextStyle(
-                                  color: mainGrey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Text(
-                        Convert.formatTime(chatRoom.createdAt),
-                        style: TextStyle(
-                          color: mainGrey,
+                  GestureDetector(
+                    onTap: () {
+                      // 채팅방 화면으로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            chatRoomId: chatRoom.id,
+                            dearName: chatRoom.loginType ==
+                                    LoginType.TRAINER.loginType
+                                ? chatRoom.name + " 훈련사님"
+                                : chatRoom.name + " 견주님",
+                          ), // 채팅방 ID 전달
                         ),
-                      ),
-                    ],
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Column(
+                              children: [
+                                Image.asset('asset/img/basic_pet.png',
+                                    width: 50),
+                              ],
+                            ),
+                            SizedBox(
+                              width: 12,
+                            ),
+                            Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      chatRoom.loginType ==
+                                              LoginType.TRAINER.loginType
+                                          ? chatRoom.name + " 훈련사님"
+                                          : chatRoom.name + " 견주님",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  chatRoom.lastMsg,
+                                  style: TextStyle(
+                                    color: mainGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Text(
+                          Convert.formatTime(chatRoom.createdAt),
+                          style: TextStyle(
+                            color: mainGrey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 12,),
+                  SizedBox(
+                    height: 12,
+                  ),
                 ],
               ),
             ),

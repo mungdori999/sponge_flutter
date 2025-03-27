@@ -3,11 +3,11 @@ import 'package:sponge_app/component/top/top_login_component.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 
-class ChatTop extends StatelessWidget {
+class ChatRoomTop extends StatelessWidget {
   JwtUtil jwtUtil = new JwtUtil();
   late LoginAuth loginAuth;
 
-  ChatTop({super.key});
+  ChatRoomTop({super.key});
 
   @override
   Widget build(BuildContext context) {

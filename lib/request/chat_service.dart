@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sponge_app/data/chat/chat_message_response.dart';
 import 'package:sponge_app/token/jwt_token.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
@@ -6,8 +9,8 @@ import 'package:stomp_dart_client/stomp_frame.dart';
 
 class ChatService {
   StompClient? stompClient;
-  final String chatRoomId;
-  final Function(String) onMessageReceived;
+  final int chatRoomId;
+  final Function(ChatMessageResponse) onMessageReceived;
 
 
   ChatService({required this.chatRoomId, required this.onMessageReceived});
@@ -33,7 +36,18 @@ class ChatService {
             destination: '/sub/channel/$chatRoomId',
             callback: (StompFrame frame) {
               if (frame.body != null) {
-                onMessageReceived(frame.body!);
+                try {
+                  // JSON 문자열을 Map으로 변환
+                  Map<String, dynamic> jsonData = jsonDecode(frame.body!);
+
+                  // ChatMessageResponse 객체로 변환
+                  ChatMessageResponse message = ChatMessageResponse.fromJson(jsonData);
+
+                  // 콜백 실행
+                  onMessageReceived(message);
+                } catch (e) {
+                  print("❌ 메시지 변환 오류: $e");
+                }
               }
             },
           );

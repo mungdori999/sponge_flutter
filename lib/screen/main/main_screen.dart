@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_app/component/bottom/bottom.dart';
-import 'package:sponge_app/component/top/chat_top.dart';
+import 'package:sponge_app/component/top/chat_room_top.dart';
 import 'package:sponge_app/component/top/common_top.dart';
 import 'package:sponge_app/component/top/home_top.dart';
 import 'package:sponge_app/component/top/my_page_top.dart';
@@ -53,7 +53,7 @@ class MainScreen extends StatelessWidget {
       case 2:
         return CommonTop();
       case 3:
-        return ChatTop();
+        return ChatRoomTop();
       case 4:
         return HomeTop();
       default:
