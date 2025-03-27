@@ -85,7 +85,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         child: Column(
           children: [
             ...chatRoomList.map(
-              (chatRoom) => Column(
+                  (chatRoom) => Column(
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -96,7 +96,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           builder: (context) => ChatScreen(
                             chatRoomId: chatRoom.id,
                             dearName: chatRoom.loginType ==
-                                    LoginType.TRAINER.loginType
+                                LoginType.TRAINER.loginType
                                 ? chatRoom.name + " 훈련사님"
                                 : chatRoom.name + " 견주님",
                           ), // 채팅방 ID 전달
@@ -106,45 +106,32 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Column(
-                              children: [
-                                Image.asset('asset/img/basic_pet.png',
-                                    width: 50),
-                              ],
-                            ),
-                            SizedBox(
-                              width: 12,
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      chatRoom.loginType ==
-                                              LoginType.TRAINER.loginType
-                                          ? chatRoom.name + " 훈련사님"
-                                          : chatRoom.name + " 견주님",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
+                        Image.asset('asset/img/basic_pet.png', width: 50),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                chatRoom.loginType == LoginType.TRAINER.loginType
+                                    ? chatRoom.name + " 훈련사님"
+                                    : chatRoom.name + " 견주님",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                SizedBox(
-                                  height: 4,
+                              ),
+                              SizedBox(height: 4),
+                              // Text의 크기 조정을 위해 Expanded 또는 Flexible 사용
+                              Text(
+                                chatRoom.lastMsg,
+                                style: TextStyle(
+                                  color: mainGrey,
                                 ),
-                                Text(
-                                  chatRoom.lastMsg,
-                                  style: TextStyle(
-                                    color: mainGrey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                overflow: TextOverflow.ellipsis, // 넘칠 경우 '...'으로 표시
+                              ),
+                            ],
+                          ),
                         ),
                         Text(
                           Convert.formatTime(chatRoom.createdAt),
@@ -155,9 +142,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 12,
-                  ),
+                  SizedBox(height: 12),
                 ],
               ),
             ),
@@ -166,4 +151,5 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       ),
     );
   }
+
 }

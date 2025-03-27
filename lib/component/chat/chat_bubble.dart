@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/chat/chat_message_response.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -19,12 +20,11 @@ class ChatBubble extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.grey[300], // 내가 보낸 메시지는 파란색
+          color: isMe ? lightYellow : Colors.white, // 내가 보낸 메시지는 파란색
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           message.message, // 메시지 내용
-          style: TextStyle(color: isMe ? Colors.white : Colors.black),
         ),
       ),
     );

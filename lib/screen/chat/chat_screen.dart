@@ -157,26 +157,58 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 30),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
               ),
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: "메시지를 입력하세요...",
-                        border: InputBorder.none,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: lightGrey,
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      onSubmitted: (_) => _sendMessage(), // Enter 키로 전송 가능
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: buttonGrey, width: 1.5),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: buttonGrey, width: 1.5),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            disabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: buttonGrey, width: 1.5),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            suffixIcon: Container(
+                              width: 10, // 원 크기
+                              height: 10, // 원 크기
+                              decoration: BoxDecoration(
+                                color: mainYellow, // 배경 색상
+                                shape: BoxShape.circle, // 원 모양
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.send, color: Colors.white),
+                                // 아이콘 색상
+                                onPressed: _sendMessage,
+                                // 전송 버튼 클릭
+                                iconSize: 15,
+                                // 아이콘 크기
+                                padding: EdgeInsets.zero, // 여백 없애기
+                              ),
+                            )),
+
+                        onSubmitted: (_) => _sendMessage(), // Enter 키로 전송 가능
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.send, color: Colors.blue),
-                    onPressed: _sendMessage, // 전송 버튼 클릭
                   ),
                 ],
               ),
