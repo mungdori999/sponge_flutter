@@ -6,6 +6,7 @@ import 'package:sponge_app/component/top/common_top.dart';
 import 'package:sponge_app/component/top/home_top.dart';
 import 'package:sponge_app/component/top/my_page_top.dart';
 import 'package:sponge_app/component/top/post_list_top.dart';
+import 'package:sponge_app/component/top/profile_top.dart';
 import 'package:sponge_app/screen/chat/chat_room_screen.dart';
 import 'package:sponge_app/screen/chat/chat_screen.dart';
 import 'package:sponge_app/screen/main/home_screen.dart';
@@ -55,7 +56,7 @@ class MainScreen extends StatelessWidget {
       case 3:
         return ChatRoomTop();
       case 4:
-        return HomeTop();
+        return MyPageTop();
       default:
         return Container();
     }

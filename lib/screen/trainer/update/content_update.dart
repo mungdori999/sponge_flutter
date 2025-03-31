@@ -1,15 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/page_index.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
+import 'package:sponge_app/request/trainer_img_reqeust.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
 
 class ContentUpdate extends StatefulWidget {
   int id;
   TrainerCreate trainerCreate;
+  File? imageFile;
 
-  ContentUpdate({super.key, required this.trainerCreate, required this.id});
+  ContentUpdate(
+      {super.key,
+      required this.trainerCreate,
+      required this.id,
+      required this.imageFile});
 
   @override
   State<ContentUpdate> createState() => _ContentUpdateState();
@@ -50,15 +59,17 @@ class _ContentUpdateState extends State<ContentUpdate> {
             child: OutlinedButton(
               onPressed: () async {
                 widget.trainerCreate.content = _contentController.text;
-
+                if (widget.imageFile != null) {
+                  String profileImg = await uploadTrainerImg(widget.imageFile!);
+                  widget.trainerCreate.profileImgUrl = profileImg;
+                }
                 await updateTrainer(widget.id, widget.trainerCreate);
-                Provider.of<PageIndexProvider>(context,
-                    listen: false)
-                    .updateIndex(3);
+                Provider.of<PageIndexProvider>(context, listen: false)
+                    .updateIndex(PageIndex.MY_PAGE.value);
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/',
-                      (Route<dynamic> route) => false,
+                  (Route<dynamic> route) => false,
                 );
               },
               style: OutlinedButton.styleFrom(

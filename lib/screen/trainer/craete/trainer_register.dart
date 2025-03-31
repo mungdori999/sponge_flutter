@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/top/write_top.dart';
 import 'package:sponge_app/const/color_const.dart';
@@ -21,6 +23,7 @@ class TrainerRegister extends StatefulWidget {
 class _TrainerRegisterState extends State<TrainerRegister> {
   TrainerCreate trainerCreate = new TrainerCreate();
   bool _enabled = false;
+  File? imageFile = null;
 
   _updateButton() {
     setState(() {
@@ -181,6 +184,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                             MaterialPageRoute(
                               builder: (context) => TrainerProfile(
                                 trainerCreate: this.trainerCreate,
+                                imageFile: imageFile,
                               ),
                             ),
                           );

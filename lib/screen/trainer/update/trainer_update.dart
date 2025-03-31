@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/top/write_top.dart';
 import 'package:sponge_app/const/color_const.dart';
@@ -21,6 +23,7 @@ class TrainerUpdate extends StatefulWidget {
 class _TrainerUpdateState extends State<TrainerUpdate> {
   late TrainerCreate trainerCreate;
   bool _enabled = true;
+  File? _imageFile;
 
   _updateButton() {
     setState(() {
@@ -73,16 +76,18 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
           child: OutlinedButton(
             onPressed: _enabled
                 ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ContentUpdate(
-                    id:widget.trainer.id,
-                    trainerCreate: trainerCreate,
-                  ),
-                ),
-              );
-            }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContentUpdate(
+                          id: widget.trainer.id,
+                          trainerCreate: trainerCreate,
+                          imageFile: _imageFile,
+
+                        ),
+                      ),
+                    );
+                  }
                 : null,
             style: OutlinedButton.styleFrom(
               backgroundColor: _enabled ? mainYellow : lightGrey,
@@ -151,13 +156,21 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
                         height: 80, // 동그라미의 높이
                         decoration: BoxDecoration(
                           color: Colors.white, // 회색 배경색
-                          shape: BoxShape.circle, // 동그라미 형태
+                          shape: BoxShape.circle,
+                          image: _imageFile != null
+                              ? DecorationImage(
+                                  image: FileImage(_imageFile!), // 선택한 이미지 표시
+                                  fit: BoxFit.cover,
+                                )
+                              : null, // 동그라미 형태
                         ),
-                        child: Icon(
-                          Icons.person, // 사람 모양 아이콘
-                          color: mainGrey, // 아이콘 색상
-                          size: 35, // 아이콘 크기
-                        ),
+                        child: _imageFile == null
+                            ? Icon(
+                                Icons.person, // 사람 모양 아이콘
+                                color: mainGrey, // 아이콘 색상
+                                size: 35, // 아이콘 크기
+                              )
+                            : null,
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,17 +210,18 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          final trainerCreate = await Navigator.push(
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => TrainerProfile(
                                 trainerCreate: this.trainerCreate,
+                                imageFile: _imageFile,
                               ),
                             ),
                           );
                           setState(() {
-                            this.trainerCreate = trainerCreate;
-                            _updateButton();
+                            this.trainerCreate = result['trainerCreate'];
+                            this._imageFile = result['imageFile'];
                           });
                         },
                         icon: Icon(

@@ -1,12 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 
 class TrainerProfile extends StatefulWidget {
   TrainerCreate trainerCreate;
-
-  TrainerProfile({super.key, required this.trainerCreate});
+  File? imageFile;
+  TrainerProfile({super.key, required this.trainerCreate,required this.imageFile});
 
   @override
   State<TrainerProfile> createState() => _TrainerProfileState();
@@ -21,8 +24,10 @@ class _TrainerProfileState extends State<TrainerProfile> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.trainerCreate.name ?? '');
-    _phoneController = TextEditingController(text: widget.trainerCreate.phone ?? '');
+    _nameController =
+        TextEditingController(text: widget.trainerCreate.name ?? '');
+    _phoneController =
+        TextEditingController(text: widget.trainerCreate.phone ?? '');
     _selectedGender = widget.trainerCreate.gender;
     _nameController.addListener(_updateButtonState);
     _phoneController.addListener(_updateButtonState);
@@ -31,8 +36,9 @@ class _TrainerProfileState extends State<TrainerProfile> {
   void _updateButtonState() {
     setState(() {
       // 모든 TextField가 입력되었는지 확인
-      enabled =
-          _nameController.text.isNotEmpty && _phoneController.text.isNotEmpty;
+      enabled = _nameController.text.isNotEmpty &&
+          _phoneController.text.isNotEmpty &&
+          widget.imageFile != null;
     });
   }
 
@@ -69,7 +75,10 @@ class _TrainerProfileState extends State<TrainerProfile> {
                 widget.trainerCreate.name = _nameController.text;
                 widget.trainerCreate.gender = _selectedGender;
                 widget.trainerCreate.phone = _phoneController.text;
-                Navigator.pop(context, widget.trainerCreate);
+                Navigator.pop(context, {
+                  'trainerCreate': widget.trainerCreate,
+                  'imageFile': widget.imageFile,
+                });
               },
               style: OutlinedButton.styleFrom(
                 backgroundColor: enabled ? mainYellow : lightGrey,
@@ -97,47 +106,86 @@ class _TrainerProfileState extends State<TrainerProfile> {
               width: double.infinity,
               child: Column(
                 children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: 100, // 동그라미의 너비
-                        height: 100, // 동그라미의 높이
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200, // 회색 배경색
-                          shape: BoxShape.circle, // 동그라미 형태
-                        ),
-                        child: Icon(
-                          Icons.person, // 사람 모양 아이콘
-                          color: Colors.grey, // 아이콘 색상
-                          size: 40, // 아이콘 크기
-                        ),
-                      ),
-                      // 오른쪽 아래 카메라 아이콘
-                      Positioned(
-                        right: 0, // 오른쪽 정렬
-                        bottom: 0, // 아래쪽 정렬
-                        child: Container(
-                          width: 30, // 카메라 아이콘 컨테이너 너비
-                          height: 30, // 카메라 아이콘 컨테이너 높이
+                  GestureDetector(
+                    onTap: () async {
+                      await pickAndUploadImage();
+                      _updateButtonState();
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 100, // 동그라미의 너비
+                          height: 100, // 동그라미의 높이
                           decoration: BoxDecoration(
-                            color: Colors.white, // 배경색
-                            shape: BoxShape.circle, // 동그라미 모양
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26, // 그림자 색상
-                                blurRadius: 4, // 그림자 흐림 정도
-                                offset: Offset(2, 2), // 그림자 위치
-                              ),
-                            ],
+                            color: Colors.grey.shade200, // 배경색
+                            shape: BoxShape.circle, // 동그라미 형태
+                            image: widget.imageFile != null
+                                ? DecorationImage(
+                                    image: FileImage(widget.imageFile!), // 선택한 이미지 표시
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                           ),
-                          child: Icon(
-                            Icons.camera_alt, // 카메라 아이콘
-                            color: Colors.grey, // 아이콘 색상
-                            size: 16, // 아이콘 크기
+                          child: widget.imageFile == null
+                              ? Icon(
+                                  Icons.person, // 기본 아이콘
+                                  color: Colors.grey,
+                                  size: 40,
+                                )
+                              : null,
+                        ),
+                        if (widget.imageFile != null)
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  widget.imageFile = null; // 이미지 파일 비우기
+                                });
+                              },
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.8),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close, // 엑스(X) 아이콘
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        // 오른쪽 아래 카메라 아이콘
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.grey,
+                              size: 16,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 16,
@@ -276,6 +324,19 @@ class _TrainerProfileState extends State<TrainerProfile> {
         ),
       ),
     );
+  }
+
+  Future<void> pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      requestFullMetadata: false,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        widget.imageFile = File(pickedFile.path); // 이미지 파일 저장
+      });
+    }
   }
 }
 

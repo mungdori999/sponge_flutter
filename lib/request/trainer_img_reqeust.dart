@@ -1,0 +1,33 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:sponge_app/http/auth_dio.dart';
+import 'package:sponge_app/http/status_code.dart';
+import 'package:sponge_app/http/url.dart';
+
+Future<String> uploadTrainerImg(File imageFile) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/trainer/image',
+  ).toString();
+
+  try {
+    String fileName = imageFile.path.split('/').last;
+    FormData formData = FormData.fromMap({
+      "multipartFile": await MultipartFile.fromFile(imageFile.path, filename: fileName), // 'file' 파라미터명을 정확히 맞추기
+    });
+
+    final response = await _dio.post(url, data: formData);
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      return response.data.toString();
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}

@@ -45,6 +45,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   stomp_dart_client: ^0.4.4
   intl: ^0.18.1
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:
