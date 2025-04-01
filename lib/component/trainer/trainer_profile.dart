@@ -1,14 +1,40 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
+import 'package:sponge_app/request/image_request.dart';
 
-class TrainerProfile extends StatelessWidget {
+class TrainerProfile extends StatefulWidget {
   final Trainer trainer;
+
   const TrainerProfile({super.key, required this.trainer});
 
   @override
+  State<TrainerProfile> createState() => _TrainerProfileState();
+}
+
+class _TrainerProfileState extends State<TrainerProfile> {
+  File? imageFile;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    imageFile = await downloadImage(widget.trainer.profileImgUrl);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String address = trainer.trainerAddressList.map((trainerAddress) {
+    final String address =
+        widget.trainer.trainerAddressList.map((trainerAddress) {
       return '${trainerAddress.city} ${trainerAddress.town}';
     }).join(' / ');
     return Column(
@@ -30,7 +56,7 @@ class TrainerProfile extends StatelessWidget {
               width: 4,
             ),
             Text(
-              trainer.name,
+              widget.trainer.name,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -80,7 +106,7 @@ class TrainerProfile extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              trainer.name,
+                              widget.trainer.name,
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
@@ -88,7 +114,7 @@ class TrainerProfile extends StatelessWidget {
                               height: 12,
                             ),
                             Text(
-                              '${trainer.years}년차',
+                              '${widget.trainer.years}년차',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w500),
                             ),
@@ -96,32 +122,47 @@ class TrainerProfile extends StatelessWidget {
                         ),
                       ],
                     ),
-                    ClipOval(
+                    if (!isLoading) ... [
+                      ClipOval(
                         child: Container(
-                      width: 70, // 동그라미의 너비
-                      height: 70, // 동그라미의 높이
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300], // 회색 배경색
-                        shape: BoxShape.circle,
-                        image: trainer.profileImgUrl == ''
-                            ? DecorationImage(
-                                image: NetworkImage("https://mungdori-bucket-domain.s3.ap-northeast-2.amazonaws.com/profile/3745a539-af31-4371-b783-21bb39ad7283.jpg"),
-                                // NetworkImage 사용
-                                fit: BoxFit.cover, // 이미지를 컨테이너에 맞게 크기 조정
-                              )
-                            : null,
-                      ),
-                      child: trainer.profileImgUrl == ''
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.person, // 사람 모양 아이콘
-                                color: Colors.white, // 아이콘 색상
-                                size: 40, // 아이콘 크기
-                              ),
-                              onPressed: () {}, // 버튼 클릭 시 실행할 동작
+                          width: 80, // 동그라미의 너비
+                          height: 80, // 동그라미의 높이
+                          decoration: BoxDecoration(
+                            color: lightGrey, // 회색 배경색
+                            shape: BoxShape.circle,
+                            image: imageFile != null
+                                ? DecorationImage(
+                              image: FileImage(imageFile!),
+                              // 선택한 이미지 표시
+                              fit: BoxFit.cover,
                             )
-                          : null,
-                    )),
+                                : null, // 동그라미 형태
+                          ),
+                          child: imageFile == null
+                              ? Icon(
+                            Icons.person, // 사람 모양 아이콘
+                            color: mainGrey, // 아이콘 색상
+                            size: 35, // 아이콘 크기
+                          )
+                              : null,
+                        ),
+                      )
+                    ]
+                    else ...[
+                      ClipOval(
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          color: lightGrey,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: mainGrey, // 로딩바 색상
+                              strokeWidth: 3.0, // 로딩바 두께
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]
                   ],
                 ),
                 SizedBox(
@@ -168,7 +209,7 @@ class TrainerProfile extends StatelessWidget {
                       child: Container(
                         width: double.infinity,
                         child: Text(
-                          trainer.content,
+                          widget.trainer.content,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -202,7 +243,7 @@ class TrainerProfile extends StatelessWidget {
                       children: [
                         Icon(Icons.star, color: mainYellow, size: 18),
                         Text(
-                          trainer.score.toString(),
+                          widget.trainer.score.toString(),
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w700),
                         ),
@@ -217,7 +258,7 @@ class TrainerProfile extends StatelessWidget {
                       style: TextStyle(fontSize: 14, color: mainGrey),
                     ),
                     Text(
-                      '${trainer.chatCount}건',
+                      '${widget.trainer.chatCount}건',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
@@ -230,7 +271,7 @@ class TrainerProfile extends StatelessWidget {
                       style: TextStyle(fontSize: 14, color: mainGrey),
                     ),
                     Text(
-                      '${trainer.adoptCount}건',
+                      '${widget.trainer.adoptCount}건',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
