@@ -5,6 +5,8 @@ import 'package:sponge_app/http/auth_dio.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 
+
+
 Future<String> uploadTrainerImg(File imageFile) async {
   var _dio = await authDio();
   final url = Uri(
