@@ -7,7 +7,7 @@ import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
 import 'package:sponge_app/http/auth_response.dart';
 import 'package:sponge_app/screen/trainer/craete/address_profile.dart';
-import 'package:sponge_app/screen/trainer/craete/content_profile.dart';
+import 'package:sponge_app/screen/trainer/craete/content_create.dart';
 import 'package:sponge_app/screen/trainer/craete/history_profile.dart';
 import 'package:sponge_app/screen/trainer/craete/trainer_profile.dart';
 
@@ -59,8 +59,9 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ContentProfile(
+                        builder: (context) => ContentCreate(
                           trainerCreate: trainerCreate,
+                          imageFile: imageFile,
                         ),
                       ),
                     );
@@ -129,17 +130,25 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 80, // 동그라미의 너비
-                        height: 80, // 동그라미의 높이
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.white, // 회색 배경색
-                          shape: BoxShape.circle, // 동그라미 형태
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          image: imageFile != null
+                              ? DecorationImage(
+                                  image: FileImage(imageFile!), // 선택한 이미지 표시
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
-                        child: Icon(
+                        child: imageFile == null
+                            ? Icon(
                           Icons.person, // 사람 모양 아이콘
                           color: mainGrey, // 아이콘 색상
                           size: 35, // 아이콘 크기
-                        ),
+                        )
+                            : null,
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +188,7 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          final trainerCreate = await Navigator.push(
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => TrainerProfile(
@@ -189,7 +198,8 @@ class _TrainerRegisterState extends State<TrainerRegister> {
                             ),
                           );
                           setState(() {
-                            this.trainerCreate = trainerCreate;
+                            this.trainerCreate = result['trainerCreate'];
+                            this.imageFile = result['imageFile'];
                             _updateButton();
                           });
                         },

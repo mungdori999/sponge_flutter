@@ -62,6 +62,11 @@ class _ContentUpdateState extends State<ContentUpdate> {
                 if (widget.imageFile != null) {
                   String profileImg = await uploadTrainerImg(widget.imageFile!);
                   widget.trainerCreate.profileImgUrl = profileImg;
+                } else {
+                  if (widget.trainerCreate.profileImgUrl != "") {
+                    await deleteTrainerImg(widget.id, widget.trainerCreate.profileImgUrl);
+                  }
+                  widget.trainerCreate.profileImgUrl = "";
                 }
                 await updateTrainer(widget.id, widget.trainerCreate);
                 Provider.of<PageIndexProvider>(context, listen: false)

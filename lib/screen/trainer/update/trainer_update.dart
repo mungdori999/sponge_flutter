@@ -10,6 +10,7 @@ import 'package:sponge_app/screen/trainer/craete/address_profile.dart';
 import 'package:sponge_app/screen/trainer/craete/history_profile.dart';
 import 'package:sponge_app/screen/trainer/craete/trainer_profile.dart';
 import 'package:sponge_app/screen/trainer/update/content_update.dart';
+import 'package:sponge_app/util/file_storage.dart';
 
 class TrainerUpdate extends StatefulWidget {
   final Trainer trainer;
@@ -23,6 +24,7 @@ class TrainerUpdate extends StatefulWidget {
 class _TrainerUpdateState extends State<TrainerUpdate> {
   late TrainerCreate trainerCreate;
   bool _enabled = true;
+  bool isLoading = true;
   File? _imageFile;
 
   _updateButton() {
@@ -38,6 +40,7 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
   @override
   void initState() {
     super.initState();
+    _getImageFile();
     // 초기화 작업
     trainerCreate = TrainerCreate(
       name: widget.trainer.name,
@@ -62,6 +65,13 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
     }).toList();
   }
 
+  void _getImageFile() async {
+    _imageFile = await getSavedImage();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +93,6 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
                           id: widget.trainer.id,
                           trainerCreate: trainerCreate,
                           imageFile: _imageFile,
-
                         ),
                       ),
                     );
@@ -151,27 +160,41 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        width: 80, // 동그라미의 너비
-                        height: 80, // 동그라미의 높이
-                        decoration: BoxDecoration(
-                          color: Colors.white, // 회색 배경색
-                          shape: BoxShape.circle,
-                          image: _imageFile != null
-                              ? DecorationImage(
-                                  image: FileImage(_imageFile!), // 선택한 이미지 표시
-                                  fit: BoxFit.cover,
+                      if (!isLoading) ...[
+                        Container(
+                          width: 80, // 동그라미의 너비
+                          height: 80, // 동그라미의 높이
+                          decoration: BoxDecoration(
+                            color: Colors.white, // 회색 배경색
+                            shape: BoxShape.circle,
+                            image: _imageFile != null
+                                ? DecorationImage(
+                                    image: FileImage(_imageFile!), // 선택한 이미지 표시
+                                    fit: BoxFit.cover,
+                                  )
+                                : null, // 동그라미 형태
+                          ),
+                          child: _imageFile == null
+                              ? Icon(
+                                  Icons.person, // 사람 모양 아이콘
+                                  color: mainGrey, // 아이콘 색상
+                                  size: 35, // 아이콘 크기
                                 )
-                              : null, // 동그라미 형태
+                              : null,
                         ),
-                        child: _imageFile == null
-                            ? Icon(
-                                Icons.person, // 사람 모양 아이콘
-                                color: mainGrey, // 아이콘 색상
-                                size: 35, // 아이콘 크기
-                              )
-                            : null,
-                      ),
+                      ] else ...[
+                        Container(
+                          width: 80,
+                          height: 80,
+                          color: lightGrey,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: mainGrey, // 로딩바 색상
+                              strokeWidth: 3.0, // 로딩바 두께
+                            ),
+                          ),
+                        ),
+                      ],
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

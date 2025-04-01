@@ -9,7 +9,9 @@ import 'package:sponge_app/data/trainer/trainer_create.dart';
 class TrainerProfile extends StatefulWidget {
   TrainerCreate trainerCreate;
   File? imageFile;
-  TrainerProfile({super.key, required this.trainerCreate,required this.imageFile});
+
+  TrainerProfile(
+      {super.key, required this.trainerCreate, required this.imageFile});
 
   @override
   State<TrainerProfile> createState() => _TrainerProfileState();
@@ -71,15 +73,17 @@ class _TrainerProfileState extends State<TrainerProfile> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: OutlinedButton(
-              onPressed: () {
-                widget.trainerCreate.name = _nameController.text;
-                widget.trainerCreate.gender = _selectedGender;
-                widget.trainerCreate.phone = _phoneController.text;
-                Navigator.pop(context, {
-                  'trainerCreate': widget.trainerCreate,
-                  'imageFile': widget.imageFile,
-                });
-              },
+              onPressed: enabled
+                  ? () {
+                      widget.trainerCreate.name = _nameController.text;
+                      widget.trainerCreate.gender = _selectedGender;
+                      widget.trainerCreate.phone = _phoneController.text;
+                      Navigator.pop(context, {
+                        'trainerCreate': widget.trainerCreate,
+                        'imageFile': widget.imageFile,
+                      });
+                    }
+                  : null,
               style: OutlinedButton.styleFrom(
                 backgroundColor: enabled ? mainYellow : lightGrey,
                 shape: RoundedRectangleBorder(
@@ -121,7 +125,8 @@ class _TrainerProfileState extends State<TrainerProfile> {
                             shape: BoxShape.circle, // 동그라미 형태
                             image: widget.imageFile != null
                                 ? DecorationImage(
-                                    image: FileImage(widget.imageFile!), // 선택한 이미지 표시
+                                    image: FileImage(
+                                        widget.imageFile!), // 선택한 이미지 표시
                                     fit: BoxFit.cover,
                                   )
                                 : null,
@@ -142,6 +147,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
                               onTap: () {
                                 setState(() {
                                   widget.imageFile = null; // 이미지 파일 비우기
+                                  enabled = true;
                                 });
                               },
                               child: Container(

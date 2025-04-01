@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/request/image_request.dart';
+import 'package:sponge_app/util/file_storage.dart';
 
 class TrainerProfile extends StatefulWidget {
   final Trainer trainer;
@@ -25,7 +26,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
   }
 
   void _getImageFile() async {
-    imageFile = await downloadImage(widget.trainer.profileImgUrl);
+    imageFile = await getSavedImage();
     setState(() {
       isLoading = false;
     });

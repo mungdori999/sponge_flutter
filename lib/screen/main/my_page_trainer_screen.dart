@@ -9,6 +9,7 @@ import 'package:sponge_app/data/review/review_check_response.dart';
 import 'package:sponge_app/data/review/review_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
+import 'package:sponge_app/request/image_request.dart';
 import 'package:sponge_app/request/review_request.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
@@ -44,6 +45,9 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
 
   Future<void> _initializeData() async {
     final myInfo = await getMyTrainerInfo();
+    if (myInfo.profileImgUrl != "") {
+      await downloadImage(myInfo.profileImgUrl);
+    }
     setState(() {
       trainer = myInfo;
     });
@@ -152,9 +156,10 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () async{
+                        onPressed: () async {
                           _initPage();
-                          reviewList = await getMyReviewByTrainerId(currentPage);
+                          reviewList =
+                              await getMyReviewByTrainerId(currentPage);
                           setState(() {
                             currentPage++;
                             _selectedIndex = 2; // 두 번째 버튼 선택 시
@@ -215,7 +220,8 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
               ),
             if (_selectedIndex == 2)
               TrainerProfileReview(
-                  reviewCheckResponse:  new ReviewCheckResponse(reviewCheck: true),
+                  reviewCheckResponse:
+                      new ReviewCheckResponse(reviewCheck: true),
                   name: trainer!.name,
                   trainerId: trainer!.id,
                   score: trainer!.score,

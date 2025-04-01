@@ -1,19 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer_create.dart';
+import 'package:sponge_app/request/trainer_img_reqeust.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 import 'package:sponge_app/screen/trainer/craete/trainer_success.dart';
 
-class ContentProfile extends StatefulWidget {
+class ContentCreate extends StatefulWidget {
   TrainerCreate trainerCreate;
+  File? imageFile;
 
-  ContentProfile({super.key, required this.trainerCreate});
+  ContentCreate(
+      {super.key, required this.trainerCreate, required this.imageFile});
 
   @override
-  State<ContentProfile> createState() => _ContentProfileState();
+  State<ContentCreate> createState() => _ContentCreateState();
 }
 
-class _ContentProfileState extends State<ContentProfile> {
+class _ContentCreateState extends State<ContentCreate> {
   late TextEditingController _contentController;
 
   @override
@@ -36,20 +41,24 @@ class _ContentProfileState extends State<ContentProfile> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black), // 뒤로 가기 버튼
             onPressed: () {
-              widget.trainerCreate.content=_contentController.text;
+              widget.trainerCreate.content = _contentController.text;
               Navigator.of(context).pop();
             },
           ),
         ),
-
         backgroundColor: Colors.white,
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: OutlinedButton(
-              onPressed: () async{
+              onPressed: () async {
                 widget.trainerCreate.content = _contentController.text;
-
+                if (widget.imageFile != null) {
+                  String profileImg = await uploadTrainerImg(widget.imageFile!);
+                  widget.trainerCreate.profileImgUrl = profileImg;
+                } else {
+                  widget.trainerCreate.profileImgUrl = "";
+                }
                 await createTrainer(widget.trainerCreate);
                 Navigator.push(
                   context,
