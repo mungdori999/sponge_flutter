@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
-import 'package:sponge_app/request/image_request.dart';
 import 'package:sponge_app/util/file_storage.dart';
 
 class TrainerProfile extends StatefulWidget {
@@ -26,8 +25,11 @@ class _TrainerProfileState extends State<TrainerProfile> {
   }
 
   void _getImageFile() async {
-    imageFile = await getSavedImage();
+    if (widget.trainer.profileImgUrl != "") imageFile = await getSavedImage();
     setState(() {
+      // 이미지캐시 삭제
+      imageCache.clear();
+      imageCache.clearLiveImages();
       isLoading = false;
     });
   }
@@ -123,7 +125,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
                         ),
                       ],
                     ),
-                    if (!isLoading) ... [
+                    if (!isLoading) ...[
                       ClipOval(
                         child: Container(
                           width: 80, // 동그라미의 너비
@@ -133,23 +135,22 @@ class _TrainerProfileState extends State<TrainerProfile> {
                             shape: BoxShape.circle,
                             image: imageFile != null
                                 ? DecorationImage(
-                              image: FileImage(imageFile!),
-                              // 선택한 이미지 표시
-                              fit: BoxFit.cover,
-                            )
+                                    image: FileImage(imageFile!),
+                                    // 선택한 이미지 표시
+                                    fit: BoxFit.cover,
+                                  )
                                 : null, // 동그라미 형태
                           ),
                           child: imageFile == null
                               ? Icon(
-                            Icons.person, // 사람 모양 아이콘
-                            color: mainGrey, // 아이콘 색상
-                            size: 35, // 아이콘 크기
-                          )
+                                  Icons.person, // 사람 모양 아이콘
+                                  color: mainGrey, // 아이콘 색상
+                                  size: 35, // 아이콘 크기
+                                )
                               : null,
                         ),
                       )
-                    ]
-                    else ...[
+                    ] else ...[
                       ClipOval(
                         child: Container(
                           width: 80,
