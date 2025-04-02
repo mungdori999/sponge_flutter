@@ -60,12 +60,16 @@ class _ContentUpdateState extends State<ContentUpdate> {
               onPressed: () async {
                 widget.trainerCreate.content = _contentController.text;
                 if (widget.imageFile != null) {
-                  await deleteTrainerImg(widget.id, widget.trainerCreate.profileImgUrl);
+                  if (widget.trainerCreate.profileImgUrl != "") {
+                    await deleteTrainerImg(
+                        widget.id, widget.trainerCreate.profileImgUrl);
+                  }
                   String profileImg = await uploadTrainerImg(widget.imageFile!);
                   widget.trainerCreate.profileImgUrl = profileImg;
                 } else {
                   if (widget.trainerCreate.profileImgUrl != "") {
-                    await deleteTrainerImg(widget.id, widget.trainerCreate.profileImgUrl);
+                    await deleteTrainerImg(
+                        widget.id, widget.trainerCreate.profileImgUrl);
                   }
                   widget.trainerCreate.profileImgUrl = "";
                 }

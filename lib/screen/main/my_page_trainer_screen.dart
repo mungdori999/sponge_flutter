@@ -9,8 +9,8 @@ import 'package:sponge_app/data/review/review_check_response.dart';
 import 'package:sponge_app/data/review/review_response.dart';
 import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
-import 'package:sponge_app/request/image_request.dart';
 import 'package:sponge_app/request/review_request.dart';
+import 'package:sponge_app/request/trainer_img_reqeust.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 
 class MyPageTrainerScreen extends StatefulWidget {
@@ -46,7 +46,8 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
   Future<void> _initializeData() async {
     final myInfo = await getMyTrainerInfo();
     if (myInfo.profileImgUrl != "") {
-      await downloadImage(myInfo.profileImgUrl);
+      await getTrainerImg(myInfo.profileImgUrl);
+
     }
     setState(() {
       trainer = myInfo;

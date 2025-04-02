@@ -40,6 +40,7 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
   @override
   void initState() {
     super.initState();
+
     _getImageFile();
     // 초기화 작업
     trainerCreate = TrainerCreate(
@@ -66,7 +67,7 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
   }
 
   void _getImageFile() async {
-    _imageFile = await getSavedImage();
+    if (widget.trainer.profileImgUrl != "") _imageFile = await getSavedImage();
     setState(() {
       isLoading = false;
     });
