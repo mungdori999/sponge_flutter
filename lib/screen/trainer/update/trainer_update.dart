@@ -67,7 +67,7 @@ class _TrainerUpdateState extends State<TrainerUpdate> {
   }
 
   void _getImageFile() async {
-    if (widget.trainer.profileImgUrl != "") _imageFile = await getSavedImage();
+    if (widget.trainer.profileImgUrl != "") _imageFile = await getSavedProfileImage();
     setState(() {
       isLoading = false;
     });

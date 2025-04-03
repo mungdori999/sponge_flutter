@@ -6,13 +6,13 @@ import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 import 'package:sponge_app/request/image_request.dart';
 
-Future<void> getTrainerImg(String imgUrl) async {
+Future<void> getPetImg(String imgUrl, int sequence) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
     host: host,
     port: port,
-    path: '${path}/trainer/image',
+    path: '${path}/pet/image',
     queryParameters: {
       'imgUrl': imgUrl,
     },
@@ -20,7 +20,7 @@ Future<void> getTrainerImg(String imgUrl) async {
 
   try {
     final response = await _dio.get(url);
-    await downloadProfileImage(response.data.toString());
+    await downloadPetImage(response.data.toString(), sequence);
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
     } else {
@@ -31,20 +31,20 @@ Future<void> getTrainerImg(String imgUrl) async {
   }
 }
 
-Future<String> uploadTrainerImg(File imageFile) async {
+Future<String> uploadPetImg(File imageFile) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
     host: host,
     port: port,
-    path: '${path}/trainer/image',
+    path: '${path}/pet/image',
   ).toString();
 
   try {
     String fileName = imageFile.path.split('/').last;
     FormData formData = FormData.fromMap({
-      "multipartFile": await MultipartFile.fromFile(imageFile.path,
-          filename: fileName), // 'file' 파라미터명을 정확히 맞추기
+      "multipartFile":
+          await MultipartFile.fromFile(imageFile.path, filename: fileName),
     });
 
     final response = await _dio.post(url, data: formData);
@@ -59,15 +59,15 @@ Future<String> uploadTrainerImg(File imageFile) async {
   }
 }
 
-Future<void> deleteTrainerImg(int trainerId, String imgUrl) async {
+Future<void> deletePetImg(int petId, String imgUrl) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
     host: host,
     port: port,
-    path: '${path}/trainer/image',
+    path: '${path}/pet/image',
     queryParameters: {
-      'trainerId': trainerId.toString(),
+      'petId': petId.toString(),
       'imgUrl': imgUrl,
     },
   ).toString();

@@ -1,18 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:sponge_app/component/bottom/next_button.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/page_index.dart';
 import 'package:sponge_app/data/pet/pet.dart';
 import 'package:sponge_app/data/pet/pet_create.dart';
+import 'package:sponge_app/request/pet_image_request.dart';
 import 'package:sponge_app/request/pet_request.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
 
 class UpdatePet extends StatefulWidget {
   final Pet pet;
+  final File? petImage;
 
-  UpdatePet({super.key, required this.pet});
+  UpdatePet({super.key, required this.pet, required this.petImage});
 
   @override
   State<UpdatePet> createState() => _UpdatePetState();
@@ -27,7 +32,7 @@ class _UpdatePetState extends State<UpdatePet> {
   bool _isNeuteredChecked = false;
   int _selectedGender = 1;
   int _selectedAge = 0;
-  bool _isButtonEnabled = false;
+  bool _isButtonEnabled = true;
 
   @override
   void initState() {
@@ -122,7 +127,7 @@ class _UpdatePetState extends State<UpdatePet> {
                                   const SizedBox(height: 16),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       OutlinedButton(
                                         style: OutlinedButton.styleFrom(
@@ -130,11 +135,15 @@ class _UpdatePetState extends State<UpdatePet> {
                                           side: BorderSide.none,
                                         ),
                                         onPressed: () async {
+                                          if (widget.pet.petImgUrl != ""){
+                                            await deletePetImg(widget.pet.id,
+                                                widget.pet.petImgUrl);
+                                          }
                                           await deletePet(widget.pet.id);
                                           Navigator.pushNamedAndRemoveUntil(
                                             context,
                                             '/',
-                                                (Route<dynamic> route) => false,
+                                            (Route<dynamic> route) => false,
                                           );
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
@@ -173,41 +182,46 @@ class _UpdatePetState extends State<UpdatePet> {
                     });
                   },
                   style: OutlinedButton.styleFrom(
-                    backgroundColor:  Colors.red ,
+                    backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),
                     ),
                     side: BorderSide.none,
-                    minimumSize: Size(MediaQuery.of(context).size.width/2.5, 48),
+                    minimumSize:
+                        Size(MediaQuery.of(context).size.width / 2.5, 48),
                   ),
-                  child:  Text(
+                  child: Text(
                     '삭제',
                     style: TextStyle(
-                      color:  Colors.white,
+                      color: Colors.white,
                       fontSize: 16,
                     ),
                   ),
                 ),
                 OutlinedButton(
-                  onPressed: _isButtonEnabled ? () {
-                    PetCreate petCreate = _settingPet();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => _UpdatePetImg(
-                          id: widget.pet.id,
-                          petCreate: petCreate,
-                        ),
-                      ),
-                    );
-                  } : null,
+                  onPressed: _isButtonEnabled
+                      ? () {
+                          PetCreate petCreate = _settingPet();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => _UpdatePetImg(
+                                id: widget.pet.id,
+                                petCreate: petCreate,
+                                imageFile: widget.petImage,
+                              ),
+                            ),
+                          );
+                        }
+                      : null,
                   style: OutlinedButton.styleFrom(
                     backgroundColor: _isButtonEnabled ? mainYellow : lightGrey,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),
                     ),
                     side: BorderSide.none,
-                    minimumSize: Size(MediaQuery.of(context).size.width/2.5, 48),
+                    minimumSize:
+                        Size(MediaQuery.of(context).size.width / 2.5, 48),
                   ),
                   child: Text(
                     '다음',
@@ -317,7 +331,7 @@ class _UpdatePetState extends State<UpdatePet> {
                     controller: _weightController,
                     cursorColor: mainYellow,
                     keyboardType:
-                    TextInputType.numberWithOptions(decimal: true),
+                        TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       hintText: '몸무게를 입력하세요',
                       suffixText: 'kg',
@@ -427,7 +441,7 @@ class _UpdatePetState extends State<UpdatePet> {
             itemExtent: 40,
             // 항목 높이
             scrollController:
-            FixedExtentScrollController(initialItem: _selectedAge),
+                FixedExtentScrollController(initialItem: _selectedAge),
             onSelectedItemChanged: (int index) {
               setState(() {
                 _selectedAge = index;
@@ -450,10 +464,7 @@ class _UpdatePetState extends State<UpdatePet> {
 
   Widget _buildButton(int index, String text) {
     bool isSelected = _selectedGender == index;
-    double width = MediaQuery
-        .of(context)
-        .size
-        .width / 6;
+    double width = MediaQuery.of(context).size.width / 6;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -491,7 +502,7 @@ class _UpdatePetState extends State<UpdatePet> {
         gender: gender,
         age: _selectedAge,
         weight: double.parse(_weightController.text),
-        petImgUrl: '');
+        petImgUrl: widget.pet.petImgUrl);
   }
 }
 
@@ -540,12 +551,22 @@ class _RequiredStar extends StatelessWidget {
   }
 }
 
-class _UpdatePetImg extends StatelessWidget {
+class _UpdatePetImg extends StatefulWidget {
   final PetCreate petCreate;
   final int id;
+  File? imageFile;
 
-  const _UpdatePetImg({super.key, required this.petCreate, required this.id});
+  _UpdatePetImg(
+      {super.key,
+      required this.petCreate,
+      required this.id,
+      required this.imageFile});
 
+  @override
+  State<_UpdatePetImg> createState() => _UpdatePetImgState();
+}
+
+class _UpdatePetImgState extends State<_UpdatePetImg> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -558,15 +579,26 @@ class _UpdatePetImg extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OutlinedButton(
-            onPressed: () {
-              updatePet(id, petCreate);
-              Provider.of<PageIndexProvider>(context,
-                  listen: false)
-                  .updateIndex(3);
+            onPressed: () async {
+              if (widget.imageFile != null) {
+                if (widget.petCreate.petImgUrl != "") {
+                  await deletePetImg(widget.id, widget.petCreate.petImgUrl);
+                }
+                widget.petCreate.petImgUrl =
+                    await uploadPetImg(widget.imageFile!);
+              } else {
+                if (widget.petCreate.petImgUrl != "") {
+                  await deletePetImg(widget.id, widget.petCreate.petImgUrl);
+                }
+                widget.petCreate.petImgUrl = "";
+              }
+              await updatePet(widget.id, widget.petCreate);
+              Provider.of<PageIndexProvider>(context, listen: false)
+                  .updateIndex(PageIndex.MY_PAGE.value);
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/',
-                    (Route<dynamic> route) => false,
+                (Route<dynamic> route) => false,
               );
             },
             style: OutlinedButton.styleFrom(
@@ -592,10 +624,7 @@ class _UpdatePetImg extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: SafeArea(
           child: Container(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height,
+            height: MediaQuery.of(context).size.height,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -619,8 +648,88 @@ class _UpdatePetImg extends StatelessWidget {
                   ],
                 ),
                 Expanded(
-                  child: Center(
-                    child: Image.asset('asset/img/basic_pet_camera.png'),
+                  child: GestureDetector(
+                    onTap: () async {
+                      await pickAndUploadImage();
+                    },
+                    child: Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 150, // 동그라미의 너비
+                            height: 150, // 동그라미의 높이
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200, // 배경색
+                              shape: BoxShape.circle, // 동그라미 형태
+                              image: widget.imageFile != null
+                                  ? DecorationImage(
+                                      image: FileImage(
+                                          widget.imageFile!), // 선택한 이미지 표시
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: widget.imageFile == null
+                                ? Icon(
+                                    Icons.pets_sharp, // 기본 아이콘
+                                    color: Colors.grey,
+                                    size: 60,
+                                  )
+                                : null,
+                          ),
+                          if (widget.imageFile != null)
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    widget.imageFile = null; // 이미지 파일 비우기
+                                  });
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.withOpacity(0.8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.close, // 엑스(X) 아이콘
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // 오른쪽 아래 카메라 아이콘
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.grey,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -629,5 +738,18 @@ class _UpdatePetImg extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      requestFullMetadata: false,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        widget.imageFile = File(pickedFile.path); // 이미지 파일 저장
+      });
+    }
   }
 }

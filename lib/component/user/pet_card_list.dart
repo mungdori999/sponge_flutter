@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:sponge_app/const/color_const.dart';
@@ -5,6 +7,7 @@ import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/pet/pet.dart';
 import 'package:sponge_app/screen/pet/register_pet.dart';
 import 'package:sponge_app/screen/pet/update_pet.dart';
+import 'package:sponge_app/util/file_storage.dart';
 
 class PetCardList extends StatefulWidget {
   final List<Pet> petList;
@@ -18,7 +21,33 @@ class PetCardList extends StatefulWidget {
 
 class _PetCardListState extends State<PetCardList> {
   final PageController _controller = PageController(); // PageView 컨트롤러
-  int _currentIndex = 0; // 현재 페이지 인덱스
+  int _currentIndex = 0;
+  bool isLoading = true;
+  Map<int, File?> imageList = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    int sequence = 1;
+    for (Pet pet in widget.petList) {
+      File? image = null;
+      if (pet.petImgUrl != "") {
+        image = await getSavedPetImage(sequence);
+      }
+      imageList[sequence] = image;
+      sequence++;
+    }
+    setState(() {
+      // 이미지캐시 삭제
+      imageCache.clear();
+      imageCache.clearLiveImages();
+      isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -40,100 +69,125 @@ class _PetCardListState extends State<PetCardList> {
               });
             },
             children: [
-              ...widget.petList
-                  .map(
-                    (pet) => Card(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
+              ...widget.petList.asMap().entries.map((entry) {
+                int index = entry.key + 1;
+                Pet pet = entry.value;
+                final imageFile = imageList[index];
+                return Card(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '반려견이름',
-                                      style: TextStyle(
-                                          fontSize: 14, color: mainGrey),
-                                    ),
-                                    Text(
-                                      pet.name,
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: mainYellow,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
+                                Text(
+                                  '반려견이름',
+                                  style:
+                                      TextStyle(fontSize: 14, color: mainGrey),
                                 ),
-                                ClipOval(
-                                  child: pet.petImgUrl == ''
-                                      ? Image.asset(
-                                          'asset/img/basic_pet.png',
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.network(
-                                          pet.petImgUrl,
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        ),
+                                Text(
+                                  pet.name,
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: mainYellow,
+                                      fontWeight: FontWeight.w700),
                                 ),
                               ],
                             ),
-                            Row(
+                            if (!isLoading) ...[
+                              ClipOval(
+                                child: Container(
+                                  width: 80, // 동그라미의 너비
+                                  height: 80, // 동그라미의 높이
+                                  decoration: BoxDecoration(
+                                    color: lightGrey, // 회색 배경색
+                                    shape: BoxShape.circle,
+                                    image: imageFile != null
+                                        ? DecorationImage(
+                                            image: FileImage(imageFile),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null, // 동그라미 형태
+                                  ),
+                                  child: imageFile == null
+                                      ? Icon(
+                                          Icons.pets,
+                                          color: mainGrey,
+                                          size: 35,
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            ] else ...[
+                              ClipOval(
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: lightGrey,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: mainGrey, // 로딩바 색상
+                                      strokeWidth: 3.0, // 로딩바 두께
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '견종',
-                                      style: TextStyle(
-                                        color: mainGrey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Text(
-                                      '기본정보',
-                                      style: TextStyle(
-                                        color: mainGrey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  '견종',
+                                  style: TextStyle(
+                                    color: mainGrey,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 50,
+                                Text(
+                                  '기본정보',
+                                  style: TextStyle(
+                                    color: mainGrey,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      pet.breed,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${Gender.getDescriptionByCode(pet.gender)} ${pet.age}살 ${pet.weight}kg',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
+                              ],
+                            ),
+                            SizedBox(
+                              width: 50,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  pet.breed,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  '${Gender.getDescriptionByCode(pet.gender)} ${pet.age}살 ${pet.weight}kg',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
-                  )
-                  .toList()
+                  ),
+                );
+              }).toList()
             ],
           ),
         ),
@@ -147,6 +201,7 @@ class _PetCardListState extends State<PetCardList> {
                   MaterialPageRoute(
                     builder: (context) => UpdatePet(
                       pet: widget.petList[_currentIndex],
+                      petImage: imageList[_currentIndex + 1],
                     ),
                   ),
                 ),
@@ -165,8 +220,10 @@ class _PetCardListState extends State<PetCardList> {
               ),
             ],
           ),
-        if(!widget.myPage)
-          SizedBox(height: 8,),
+        if (!widget.myPage)
+          SizedBox(
+            height: 8,
+          ),
         if (widget.petList.length > 1)
           SmoothPageIndicator(
             controller: _controller, // PageController 연결

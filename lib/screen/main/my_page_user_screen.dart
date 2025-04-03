@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/home/home_post_card.dart';
-import 'package:sponge_app/component/mypage/alert_login.dart';
 import 'package:sponge_app/component/user/add_pet.dart';
 import 'package:sponge_app/component/user/pet_card_list.dart';
 import 'package:sponge_app/component/user/user_profile.dart';
@@ -9,6 +10,7 @@ import 'package:sponge_app/data/pet/pet.dart';
 import 'package:sponge_app/data/post/post_list_response.dart';
 import 'package:sponge_app/data/user/user.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
+import 'package:sponge_app/request/pet_image_request.dart';
 import 'package:sponge_app/request/pet_request.dart';
 import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/request/user_request.dart';
@@ -54,7 +56,11 @@ class _MyPageUserScreenState extends State<MyPageUserScreen> {
     final myInfo = await getMyUserInfo();
     final myPet = await getMyPet();
     final myPost = await getMyPost(currentPage);
-
+    int sequence = 1;
+    for (var pet in myPet) {
+      if (pet.petImgUrl != "") await getPetImg(pet.petImgUrl, sequence);
+      sequence++;
+    }
     setState(() {
       user = myInfo;
       petList = myPet;

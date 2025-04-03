@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sponge_app/component/bottom/next_button.dart';
 import 'package:sponge_app/component/top/register_top.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/data/pet/pet_create.dart';
+import 'package:sponge_app/request/pet_image_request.dart';
 import 'package:sponge_app/request/pet_request.dart';
 
 class RegisterPet extends StatefulWidget {
-   RegisterPet({super.key});
+  RegisterPet({super.key});
+
   @override
   State<RegisterPet> createState() => _RegisterPetState();
 }
@@ -394,10 +399,17 @@ class _CustomTextFiled extends StatelessWidget {
   }
 }
 
-class _RegisterPetImg extends StatelessWidget {
+class _RegisterPetImg extends StatefulWidget {
   final PetCreate petCreate;
 
   const _RegisterPetImg({super.key, required this.petCreate});
+
+  @override
+  State<_RegisterPetImg> createState() => _RegisterPetImgState();
+}
+
+class _RegisterPetImgState extends State<_RegisterPetImg> {
+  File? imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -411,8 +423,11 @@ class _RegisterPetImg extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OutlinedButton(
-            onPressed: () {
-              createPet(petCreate);
+            onPressed: () async {
+              if (imageFile != null) {
+                widget.petCreate.petImgUrl = await uploadPetImg(imageFile!);
+              }
+              createPet(widget.petCreate);
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/',
@@ -466,8 +481,88 @@ class _RegisterPetImg extends StatelessWidget {
                   ],
                 ),
                 Expanded(
-                  child: Center(
-                    child: Image.asset('asset/img/basic_pet_camera.png'),
+                  child: GestureDetector(
+                    onTap: () async {
+                      await pickAndUploadImage();
+                    },
+                    child: Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 150, // 동그라미의 너비
+                            height: 150, // 동그라미의 높이
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200, // 배경색
+                              shape: BoxShape.circle, // 동그라미 형태
+                              image: imageFile != null
+                                  ? DecorationImage(
+                                      image:
+                                          FileImage(imageFile!), // 선택한 이미지 표시
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: imageFile == null
+                                ? Icon(
+                                    Icons.pets_sharp, // 기본 아이콘
+                                    color: Colors.grey,
+                                    size: 60,
+                                  )
+                                : null,
+                          ),
+                          if (imageFile != null)
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    imageFile = null; // 이미지 파일 비우기
+                                  });
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.withOpacity(0.8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.close, // 엑스(X) 아이콘
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          // 오른쪽 아래 카메라 아이콘
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.grey,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -476,5 +571,18 @@ class _RegisterPetImg extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      requestFullMetadata: false,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path); // 이미지 파일 저장
+      });
+    }
   }
 }

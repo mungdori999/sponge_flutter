@@ -25,7 +25,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
   }
 
   void _getImageFile() async {
-    if (widget.trainer.profileImgUrl != "") imageFile = await getSavedImage();
+    if (widget.trainer.profileImgUrl != "") imageFile = await getSavedProfileImage();
     setState(() {
       // 이미지캐시 삭제
       imageCache.clear();
@@ -149,7 +149,7 @@ class _TrainerProfileState extends State<TrainerProfile> {
                                 )
                               : null,
                         ),
-                      )
+                      ),
                     ] else ...[
                       ClipOval(
                         child: Container(
