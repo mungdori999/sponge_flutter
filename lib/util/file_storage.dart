@@ -15,6 +15,21 @@ Future<File?> getSavedProfileImage() async {
   }
 }
 
+Future<void> deleteSavedProfileImage() async {
+  final dir = await getTemporaryDirectory(); // 임시 저장소 경로 가져오기
+  final filePath = '${dir.path}/profile.jpg'; // 저장된 파일 경로
+
+  final file = File(filePath);
+
+  if (await file.exists()) {
+    await file.delete(); // 파일 삭제
+    print('프로필 이미지 삭제 완료');
+  } else {
+    print('삭제할 이미지가 없습니다.');
+  }
+}
+
+
 Future<File?> getSavedPetImage(int sequence) async {
   final dir = await getTemporaryDirectory(); // 임시 저장소 경로 가져오기
   final filePath = '${dir.path}/${sequence}.jpg'; // 저장된 파일 경로

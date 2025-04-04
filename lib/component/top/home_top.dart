@@ -2,38 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:sponge_app/component/top/top_login_component.dart';
 import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/login_type.dart';
+import 'package:sponge_app/data/trainer/trainer.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
-import 'package:sponge_app/screen/login_screen.dart';
+import 'package:sponge_app/request/trainer_img_reqeust.dart';
+import 'package:sponge_app/request/trainer_reqeust.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
 
-class HomeTop extends StatelessWidget {
-  JwtUtil jwtUtil = new JwtUtil();
-  late LoginAuth loginAuth;
-
+class HomeTop extends StatefulWidget {
   HomeTop({super.key});
 
   @override
+  State<HomeTop> createState() => _HomeTopState();
+}
+
+class _HomeTopState extends State<HomeTop> {
+  JwtUtil jwtUtil = new JwtUtil();
+
+  late LoginAuth loginAuth;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  void _initializeData() async {
+    loginAuth = await jwtUtil.getJwtToken();
+    if (loginAuth.id != 0 && loginAuth.loginType == LoginType.TRAINER.value) {
+      Trainer myInfo = await getMyTrainerInfo();
+      if (myInfo.profileImgUrl != "") {
+        await getTrainerImg(myInfo.profileImgUrl);
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<LoginAuth>(
-        future: jwtUtil.getJwtToken(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(); // 데이터 로딩 중
-          }
-          if (snapshot.hasError) {
-            return Text('오류 발생: ${snapshot.error}');
-          }
-          loginAuth = snapshot.data!;
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Image.asset(
-                'asset/img/logo.png',
-                width: 150,
-              ),
-              TopLoginComponent(loginAuth: loginAuth),
-            ],
-          );
-        });
+    if (isLoading) {
+      return CircularProgressIndicator(color: mainYellow,);
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Image.asset(
+            'asset/img/logo.png',
+            width: 150,
+          ),
+          TopLoginComponent(loginAuth: loginAuth),
+        ],
+      );
+    }
   }
 }
