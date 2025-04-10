@@ -5,7 +5,6 @@ import 'package:sponge_app/http/auth_dio.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 import 'package:sponge_app/request/image_request.dart';
-import 'package:sponge_app/util/file_storage.dart';
 
 Future<void> getTrainerImg(String imgUrl) async {
   var _dio = await authDio();
@@ -21,7 +20,7 @@ Future<void> getTrainerImg(String imgUrl) async {
 
   try {
     final response = await _dio.get(url);
-    await deleteSavedProfileImage();
+
     await downloadProfileImage(response.data.toString());
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_app/const/color_const.dart';
+import 'package:sponge_app/const/page_index.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
 
 class TrainerSuccess extends StatelessWidget {
@@ -16,7 +17,7 @@ class TrainerSuccess extends StatelessWidget {
           child: OutlinedButton(
             onPressed: () {
               Provider.of<PageIndexProvider>(context, listen: false)
-                  .updateIndex(1);
+                  .updateIndex(PageIndex.HOME.value);
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/',

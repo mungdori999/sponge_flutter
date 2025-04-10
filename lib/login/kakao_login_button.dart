@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:provider/provider.dart';
 import 'package:sponge_app/const/login_type.dart';
+import 'package:sponge_app/const/page_index.dart';
 import 'package:sponge_app/http/auth_response.dart';
 import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 import 'package:sponge_app/screen/trainer/craete/trainer_register.dart';
 import 'package:sponge_app/token/jwt_token.dart';
+import 'package:sponge_app/util/page_index_provider.dart';
 
 class KakaoLoginButton extends StatelessWidget {
   final String loginType;
@@ -29,6 +32,8 @@ class KakaoLoginButton extends StatelessWidget {
             AuthResponse authResponse =await kakaoLogin(loginType); // 로그인 작업 완료까지 기다린 후
             //로그인에 성공했다면
             if(authResponse.login) {
+              Provider.of<PageIndexProvider>(context, listen: false)
+                  .updateIndex(PageIndex.HOME.value);
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/', // 홈 화면의 route 이름

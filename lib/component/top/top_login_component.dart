@@ -88,7 +88,7 @@ class _TopLoginComponentState extends State<TopLoginComponent> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey[400],
+                color: lightGrey,
                 shape: BoxShape.circle,
                 image: profileImage != null
                     ? DecorationImage(
@@ -102,7 +102,7 @@ class _TopLoginComponentState extends State<TopLoginComponent> {
                   ? Icon(
                 Icons.person, // 사람 모양 아이콘
                 color: mainGrey, // 아이콘 색상
-                size: 35, // 아이콘 크기
+                size: 25, // 아이콘 크기
               )
                   : null,
             ),

@@ -7,6 +7,7 @@ import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/trainer_img_reqeust.dart';
 import 'package:sponge_app/request/trainer_reqeust.dart';
 import 'package:sponge_app/token/jwtUtil.dart';
+import 'package:sponge_app/util/file_storage.dart';
 
 class HomeTop extends StatefulWidget {
   HomeTop({super.key});
@@ -32,8 +33,12 @@ class _HomeTopState extends State<HomeTop> {
     if (loginAuth.id != 0 && loginAuth.loginType == LoginType.TRAINER.value) {
       Trainer myInfo = await getMyTrainerInfo();
       if (myInfo.profileImgUrl != "") {
+        await deleteSavedProfileImage();
         await getTrainerImg(myInfo.profileImgUrl);
       }
+    }
+    if (loginAuth.id != 0 && loginAuth.loginType == LoginType.USER.value) {
+        await deleteSavedProfileImage();
     }
     setState(() {
       isLoading = false;
