@@ -56,10 +56,8 @@ class _MyPageUserScreenState extends State<MyPageUserScreen> {
     final myInfo = await getMyUserInfo();
     final myPet = await getMyPet();
     final myPost = await getMyPost(currentPage);
-    int sequence = 1;
     for (var pet in myPet) {
-      if (pet.petImgUrl != "") await getPetImg(pet.petImgUrl, sequence);
-      sequence++;
+      if (pet.petImgUrl != "") await getPetImg(pet.petImgUrl, pet.id);
     }
     setState(() {
       user = myInfo;

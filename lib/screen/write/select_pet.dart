@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,7 @@ import 'package:sponge_app/const/color_const.dart';
 import 'package:sponge_app/const/gender.dart';
 import 'package:sponge_app/data/pet/pet.dart';
 import 'package:sponge_app/screen/write/select_category.dart';
+import 'package:sponge_app/util/file_storage.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
 
 class SelectPet extends StatefulWidget {
@@ -21,11 +24,33 @@ class SelectPet extends StatefulWidget {
 class _SelectPetState extends State<SelectPet> {
   int _selectedIndex = 0;
   Pet? pet;
+  bool isLoading = true;
+  Map<int, File?> imageList = {};
 
   @override
   void initState() {
     super.initState();
     pet = widget.petList.length != 0 ? widget.petList[0] : null;
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    int sequence = 1;
+    for (Pet pet in widget.petList) {
+      File? image = null;
+      if (pet.petImgUrl != "") {
+        image = await getSavedPetImage(pet.id);
+      }
+      imageList[sequence] = image;
+      sequence++;
+    }
+
+    setState(() {
+      // 이미지캐시 삭제
+      imageCache.clear();
+      imageCache.clearLiveImages();
+      isLoading = false;
+    });
   }
 
   @override
@@ -93,6 +118,7 @@ class _SelectPetState extends State<SelectPet> {
                 ...widget.petList.asMap().entries.map((entry) {
                   int index = entry.key; // 현재 인덱스
                   Pet pet = entry.value;
+                  final imageFile = imageList[index+1];
                   return Column(
                     children: [
                       SizedBox(
@@ -119,10 +145,46 @@ class _SelectPetState extends State<SelectPet> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              pet.petImgUrl == ''
-                                  ? Image.asset('asset/img/basic_pet.png',
-                                      width: 80)
-                                  : Image.network(pet.petImgUrl, width: 80),
+                             if(!isLoading)...[
+                               ClipOval(
+                                 child: Container(
+                                   width: 80, // 동그라미의 너비
+                                   height: 80, // 동그라미의 높이
+                                   decoration: BoxDecoration(
+                                     color: Colors.white, // 회색 배경색
+                                     shape: BoxShape.circle,
+                                     image: imageFile != null
+                                         ? DecorationImage(
+                                       image: FileImage(imageFile),
+                                       fit: BoxFit.cover,
+                                     )
+                                         : null, // 동그라미 형태
+                                   ),
+                                   child: imageFile == null
+                                       ? Icon(
+                                     Icons.pets,
+                                     color: mainGrey,
+                                     size: 35,
+                                   )
+                                       : null,
+                                 ),
+                               ),
+                             ]
+                              else...[
+                               ClipOval(
+                                 child: Container(
+                                   width: 80,
+                                   height: 80,
+                                   color: lightGrey,
+                                   child: Center(
+                                     child: CircularProgressIndicator(
+                                       color: mainGrey, // 로딩바 색상
+                                       strokeWidth: 3.0, // 로딩바 두께
+                                     ),
+                                   ),
+                                 ),
+                               ),
+                             ],
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

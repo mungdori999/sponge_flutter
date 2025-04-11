@@ -30,9 +30,9 @@ Future<void> deleteSavedProfileImage() async {
 }
 
 
-Future<File?> getSavedPetImage(int sequence) async {
+Future<File?> getSavedPetImage(int petId) async {
   final dir = await getTemporaryDirectory(); // 임시 저장소 경로 가져오기
-  final filePath = '${dir.path}/${sequence}.jpg'; // 저장된 파일 경로
+  final filePath = '${dir.path}/${petId}.jpg'; // 저장된 파일 경로
 
   final file = File(filePath);
   if (await file.exists()) {

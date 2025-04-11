@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +14,7 @@ import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/screen/write/select_pet.dart';
 import 'package:sponge_app/screen/write/write_modal.dart';
+import 'package:sponge_app/util/file_storage.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
 
 class WritePost extends StatefulWidget {
@@ -19,10 +22,11 @@ class WritePost extends StatefulWidget {
   final List<int> categoryCodeList;
   final PostResponse? post;
 
-  WritePost({super.key,
-    required this.pet,
-    required this.categoryCodeList,
-    required this.post});
+  WritePost(
+      {super.key,
+      required this.pet,
+      required this.categoryCodeList,
+      required this.post});
 
   @override
   State<WritePost> createState() => _WritePostState();
@@ -37,6 +41,8 @@ class _WritePostState extends State<WritePost> {
   List<String> _hashTagList = []; // 완성된 태그 목록
   List<String> _fileList = [];
   bool _hasHashtag = false;
+  bool isLoading = true;
+  File? petImage = null;
 
   @override
   void initState() {
@@ -53,6 +59,18 @@ class _WritePostState extends State<WritePost> {
     _titleController.addListener(_updateButtonState);
     _contentController.addListener(_updateButtonState);
     _durationController.addListener(_updateButtonState);
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    if (widget.pet.petImgUrl != "")
+      petImage = await getSavedPetImage(widget.pet.id);
+    setState(() {
+      // 이미지캐시 삭제
+      imageCache.clear();
+      imageCache.clearLiveImages();
+      isLoading = false;
+    });
   }
 
   @override
@@ -148,74 +166,75 @@ class _WritePostState extends State<WritePost> {
             child: OutlinedButton(
               onPressed: enabled
                   ? () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) {
-                    if (widget.post == null) {
-                      return WriteModal(
-                        titleText: '작성한 글을 등록 하시겠어요?',
-                        completeText: '등록',
-                        completePost: () async {
-                          PostCreate postCreate = new PostCreate(
-                              petId: widget.pet.id,
-                              title: _titleController.text,
-                              content: _contentController.text,
-                              duration: _durationController.text,
-                              fileUrlList: _fileList,
-                              hashTagList: _hashTagList
-                                  .map((tag) => tag.substring(1))
-                                  .toList(),
-                              categoryCodeList: widget.categoryCodeList);
-                          await createPost(postCreate);
-                          Provider.of<PageIndexProvider>(context,
-                              listen: false)
-                              .updateIndex(1);
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/',
-                                (Route<dynamic> route) => false,
-                          );
-                        },
-                      );
-                    } else {
-                      return WriteModal(
-                        titleText: '작성한 글을 수정 하시겠어요?',
-                        completeText: '수정',
-                        completePost: () async {
-                          PostUpdate postUpdate = new PostUpdate(
-                              title: _titleController.text,
-                              content: _contentController.text,
-                              duration: _durationController.text,
-                              fileUrlList: _fileList,
-                              hashTagList: _hashTagList
-                                  .map((tag) => tag.substring(1))
-                                  .toList(),
-                              categoryCodeList: widget.categoryCodeList);
-                          await updatePost(widget.post!.id, postUpdate);
-                          Provider.of<PageIndexProvider>(context,
-                              listen: false)
-                              .updateIndex(1);
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/',
-                                (Route<dynamic> route) => false,
-                          );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PostScreen(id: widget.post!.id),
-                            ),
-                          );
+                      showModalBottomSheet(
+                        context: context,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          if (widget.post == null) {
+                            return WriteModal(
+                              titleText: '작성한 글을 등록 하시겠어요?',
+                              completeText: '등록',
+                              completePost: () async {
+                                PostCreate postCreate = new PostCreate(
+                                    petId: widget.pet.id,
+                                    title: _titleController.text,
+                                    content: _contentController.text,
+                                    duration: _durationController.text,
+                                    fileUrlList: _fileList,
+                                    hashTagList: _hashTagList
+                                        .map((tag) => tag.substring(1))
+                                        .toList(),
+                                    categoryCodeList: widget.categoryCodeList);
+                                await createPost(postCreate);
+                                Provider.of<PageIndexProvider>(context,
+                                        listen: false)
+                                    .updateIndex(1);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/',
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                            );
+                          } else {
+                            return WriteModal(
+                              titleText: '작성한 글을 수정 하시겠어요?',
+                              completeText: '수정',
+                              completePost: () async {
+                                PostUpdate postUpdate = new PostUpdate(
+                                    title: _titleController.text,
+                                    content: _contentController.text,
+                                    duration: _durationController.text,
+                                    fileUrlList: _fileList,
+                                    hashTagList: _hashTagList
+                                        .map((tag) => tag.substring(1))
+                                        .toList(),
+                                    categoryCodeList: widget.categoryCodeList);
+                                await updatePost(widget.post!.id, postUpdate);
+                                Provider.of<PageIndexProvider>(context,
+                                        listen: false)
+                                    .updateIndex(1);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/',
+                                  (Route<dynamic> route) => false,
+                                );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PostScreen(id: widget.post!.id),
+                                  ),
+                                );
+                              },
+                            );
+                          }
                         },
                       );
                     }
-                  },
-                );
-              }
                   : null,
               style: OutlinedButton.styleFrom(
                 backgroundColor: enabled ? mainYellow : lightGrey,
@@ -259,21 +278,45 @@ class _WritePostState extends State<WritePost> {
                 ),
                 Row(
                   children: [
-                    Container(
-                      width: 44, // 이미지의 너비
-                      height: 44, // 이미지의 높이
-                      child: ClipOval(
-                        child: widget.pet.petImgUrl == ''
-                            ? Image.asset(
-                          'asset/img/basic_pet.png',
-                          fit: BoxFit.cover,
-                        )
-                            : Image.network(
-                          widget.pet.petImgUrl,
-                          fit: BoxFit.cover,
+                    if (!isLoading) ...[
+                      ClipOval(
+                        child: Container(
+                          width: 44, // 동그라미의 너비
+                          height: 44, // 동그라미의 높이
+                          decoration: BoxDecoration(
+                            color: lightGrey, // 회색 배경색
+                            shape: BoxShape.circle,
+                            image: petImage != null
+                                ? DecorationImage(
+                              image: FileImage(petImage!),
+                              fit: BoxFit.cover,
+                            )
+                                : null, // 동그라미 형태
+                          ),
+                          child: petImage == null
+                              ? Icon(
+                            Icons.pets,
+                            color: mainGrey,
+                            size: 20,
+                          )
+                              : null,
                         ),
                       ),
-                    ),
+                    ] else ...[
+                      ClipOval(
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          color: lightGrey,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: mainGrey, // 로딩바 색상
+                              strokeWidth: 3.0, // 로딩바 두께
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                     SizedBox(
                       width: 8,
                     ),
@@ -486,12 +529,11 @@ class _WritePostState extends State<WritePost> {
                   runSpacing: 8.0,
                   children: _hashTagList
                       .map(
-                        (tag) =>
-                        GestureDetector(
+                        (tag) => GestureDetector(
                           onTap: () => _deleteTag(tag), // 태그 클릭 시 삭제
                           child: _buildTagChip(tag),
                         ),
-                  )
+                      )
                       .toList(),
                 ),
                 TextField(

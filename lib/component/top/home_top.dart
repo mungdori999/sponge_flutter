@@ -21,7 +21,6 @@ class _HomeTopState extends State<HomeTop> {
 
   late LoginAuth loginAuth;
   bool isLoading = true;
-
   @override
   void initState() {
     super.initState();

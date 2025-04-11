@@ -36,7 +36,7 @@ class _PetCardListState extends State<PetCardList> {
     for (Pet pet in widget.petList) {
       File? image = null;
       if (pet.petImgUrl != "") {
-        image = await getSavedPetImage(sequence);
+        image = await getSavedPetImage(pet.id);
       }
       imageList[sequence] = image;
       sequence++;
