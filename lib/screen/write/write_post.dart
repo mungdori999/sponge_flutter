@@ -478,41 +478,44 @@ class _WritePostState extends State<WritePost> {
                 SizedBox(
                   height: 8,
                 ),
-                DottedBorder(
-                  color: mainGrey,
-                  strokeWidth: 1,
-                  dashPattern: [6, 3],
-                  borderType: BorderType.RRect,
-                  radius: Radius.circular(12),
-                  child: Container(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 30),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 25,
-                            height: 25,
-                            decoration: BoxDecoration(
-                              color: checkGrey,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 25 * 0.6, // 아이콘 크기 비율
+                GestureDetector(
+                  onTap: (){},
+                  child: DottedBorder(
+                    color: mainGrey,
+                    strokeWidth: 1,
+                    dashPattern: [6, 3],
+                    borderType: BorderType.RRect,
+                    radius: Radius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                color: checkGrey,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 25 * 0.6, // 아이콘 크기 비율
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            '사진이나 동영상을 첨부해주세요',
-                            style: TextStyle(
-                              color: mainGrey,
-                              fontSize: 16,
+                            Text(
+                              '사진이나 동영상을 첨부해주세요',
+                              style: TextStyle(
+                                color: mainGrey,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

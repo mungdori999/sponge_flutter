@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/post/bookmark_button.dart';
 import 'package:sponge_app/component/post/post_like_button.dart';
@@ -10,14 +12,45 @@ import 'package:sponge_app/request/post_request.dart';
 import 'package:sponge_app/screen/user/user_individual_profile.dart';
 import 'package:sponge_app/screen/write/select_category.dart';
 import 'package:sponge_app/util/convert.dart';
+import 'package:sponge_app/util/file_storage.dart';
 
-class PostDetails extends StatelessWidget {
+class PostDetails extends StatefulWidget {
   final PostResponse post;
   final bool myPost;
   final PostCheckResponse check;
   final String loginType;
 
-  const PostDetails({super.key, required this.post, required this.myPost, required this.check, required this.loginType});
+  const PostDetails(
+      {super.key,
+      required this.post,
+      required this.myPost,
+      required this.check,
+      required this.loginType});
+
+  @override
+  State<PostDetails> createState() => _PostDetailsState();
+}
+
+class _PostDetailsState extends State<PostDetails> {
+  bool isLoading = true;
+  File? petImage = null;
+
+  @override
+  void initState() {
+    super.initState();
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    if (widget.post.pet.petImgUrl != "")
+      petImage = await getSavedPetImage(widget.post.pet.id);
+    setState(() {
+      // 이미지캐시 삭제
+      imageCache.clear();
+      imageCache.clearLiveImages();
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +64,7 @@ class PostDetails extends StatelessWidget {
           ),
           Row(
             children: [
-              ...post.postCategoryList.map((postCategory) {
+              ...widget.post.postCategoryList.map((postCategory) {
                 final description = CategoryCode.getDescriptionByCode(
                     postCategory.categoryCode);
                 return Row(
@@ -60,7 +93,7 @@ class PostDetails extends StatelessWidget {
             height: 8,
           ),
           Text(
-            post.title,
+            widget.post.title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -75,110 +108,145 @@ class PostDetails extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => UserIndividualProfile(
-                    id: post.userId,
+                    id: widget.post.userId,
                   ),
                 ),
               );
             },
             child: Row(
               children: [
-                Container(
-                  width: 44, // 이미지의 너비
-                  height: 44, // 이미지의 높이
-                  child: ClipOval(
-                    child: Image.network(
-                      'https://media.istockphoto.com/id/1482199015/ko/%EC%82%AC%EC%A7%84/%ED%96%89%EB%B3%B5%ED%95%9C-%EA%B0%95%EC%95%84%EC%A7%80-%EC%9B%A8%EC%9D%BC%EC%8A%A4-%EC%96%B4-%EC%BD%94%EA%B8%B0-14-%EC%A3%BC%EB%A0%B9-%EA%B0%9C%EA%B0%80-%EC%9C%99%ED%81%AC%ED%95%98%EA%B3%A0-%ED%97%90%EB%96%A1%EC%9D%B4%EA%B3%A0-%ED%9D%B0%EC%83%89%EC%97%90-%EA%B3%A0%EB%A6%BD%EB%90%98%EC%96%B4-%EC%95%89%EC%95%84-%EC%9E%88%EC%8A%B5%EB%8B%88%EB%8B%A4.jpg?s=612x612&w=0&k=20&c=vW29tbABUS2fEJvPi8gopZupfTKErCDMfeq5rrOaAME=',
-                      fit: BoxFit.cover, // 이미지 크기 조정
+                if (!isLoading) ...[
+                  ClipOval(
+                    child: Container(
+                      width: 44, // 동그라미의 너비
+                      height: 44, // 동그라미의 높이
+                      decoration: BoxDecoration(
+                        color: lightGrey, // 회색 배경색
+                        shape: BoxShape.circle,
+                        image: petImage != null
+                            ? DecorationImage(
+                                image: FileImage(petImage!),
+                                fit: BoxFit.cover,
+                              )
+                            : null, // 동그라미 형태
+                      ),
+                      child: petImage == null
+                          ? Icon(
+                              Icons.pets,
+                              color: mainGrey,
+                              size: 20,
+                            )
+                          : null,
                     ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      post.pet.name,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width - 80,
-                      child: Row(
-                        children: [
-                          Text(
-                            post.pet.breed,
-                            style: TextStyle(fontSize: 12, color: mainGrey),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '·', // 가운데 점
-                            style: TextStyle(
-                              fontSize: 16, // 점 크기
-                              color: mainGrey, // 점 색상
-                            ),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            Gender.getDescriptionByCode(post.pet.gender),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: mainGrey,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '·', // 가운데 점
-                            style: TextStyle(
-                              fontSize: 16, // 점 크기
-                              color: mainGrey, // 점 색상
-                            ),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '${post.pet.age}살',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: mainGrey,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '·', // 가운데 점
-                            style: TextStyle(
-                              fontSize: 16, // 점 크기
-                              color: mainGrey, // 점 색상
-                            ),
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '${post.pet.weight}kg',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: mainGrey,
-                            ),
-                          ),
-                          Spacer(),
-                          Text(
-                            Convert.convertTimeAgo(post.createdAt),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: mainGrey,
-                            ),
-                          ),
-                        ],
+                ] else ...[
+                  ClipOval(
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      color: lightGrey,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: mainGrey, // 로딩바 색상
+                          strokeWidth: 3.0, // 로딩바 두께
+                        ),
                       ),
                     ),
-                  ],
+                  ),
+                ],
+                SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.post.pet.name,
+                        style:
+                            TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width - 80,
+                        child: Row(
+                          children: [
+                            Text(
+                              widget.post.pet.breed,
+                              style: TextStyle(fontSize: 12, color: mainGrey),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '·', // 가운데 점
+                              style: TextStyle(
+                                fontSize: 16, // 점 크기
+                                color: mainGrey, // 점 색상
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              Gender.getDescriptionByCode(widget.post.pet.gender),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: mainGrey,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '·', // 가운데 점
+                              style: TextStyle(
+                                fontSize: 16, // 점 크기
+                                color: mainGrey, // 점 색상
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '${widget.post.pet.age}살',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: mainGrey,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '·', // 가운데 점
+                              style: TextStyle(
+                                fontSize: 16, // 점 크기
+                                color: mainGrey, // 점 색상
+                              ),
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '${widget.post.pet.weight}kg',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: mainGrey,
+                              ),
+                            ),
+                            Spacer(),
+                            Text(
+                              Convert.convertTimeAgo(widget.post.createdAt),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: mainGrey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -194,7 +262,7 @@ class PostDetails extends StatelessWidget {
             height: 12,
           ),
           Text(
-            post.content,
+            widget.post.content,
             style: TextStyle(
               color: darkGrey,
               fontSize: 16,
@@ -205,7 +273,7 @@ class PostDetails extends StatelessWidget {
           ),
           Row(
             children: [
-              ...post.tagList.map((tag) {
+              ...widget.post.tagList.map((tag) {
                 return Row(
                   children: [
                     Text(
@@ -230,22 +298,22 @@ class PostDetails extends StatelessWidget {
               Row(
                 children: [
                   PostLikeButton(
-                    postId: post.id,
-                    likeCount: post.likeCount,
-                    flag: check.likeCheck,
-                    loginType: loginType,
+                    postId: widget.post.id,
+                    likeCount: widget.post.likeCount,
+                    flag: widget.check.likeCheck,
+                    loginType: widget.loginType,
                   ),
                   SizedBox(
                     width: 8,
                   ),
                   BookmarkButton(
-                    postId: post.id,
-                    flag: check.bookmarkCheck,
-                    loginType: loginType,
+                    postId: widget.post.id,
+                    flag: widget.check.bookmarkCheck,
+                    loginType: widget.loginType,
                   ),
                 ],
               ),
-              if (myPost)
+              if (widget.myPost)
                 PopupMenuButton(
                   color: Colors.white,
                   onSelected: (value) {
@@ -254,11 +322,12 @@ class PostDetails extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SelectCategory(
-                            pet: post.pet,
-                            selectedCategoryIndexList: post.postCategoryList
+                            pet: widget.post.pet,
+                            selectedCategoryIndexList: widget
+                                .post.postCategoryList
                                 .map((category) => category.categoryCode)
                                 .toSet(),
-                            post: post,
+                            post: widget.post,
                           ),
                         ),
                       );
@@ -294,7 +363,7 @@ class PostDetails extends StatelessWidget {
                                           side: BorderSide.none,
                                         ),
                                         onPressed: () async {
-                                          await deletePost(post.id);
+                                          await deletePost(widget.post.id);
                                           Navigator.pushNamedAndRemoveUntil(
                                             context,
                                             '/', // 홈 화면의 route 이름
