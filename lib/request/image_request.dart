@@ -1,6 +1,17 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+Future<Uint8List?> getProfileImage(String presignedUrl) async {
+  try {
+    final response = await http.get(Uri.parse(presignedUrl));
+    return response.bodyBytes;
+  } catch (e) {
+    print("에러 발생: $e");
+    return null;
+  }
+}
 
 Future<File?> downloadProfileImage(String presignedUrl) async {
   try {

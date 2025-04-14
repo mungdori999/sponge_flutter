@@ -33,7 +33,7 @@ class _HomeTopState extends State<HomeTop> {
       Trainer myInfo = await getMyTrainerInfo();
       if (myInfo.profileImgUrl != "") {
         await deleteSavedProfileImage();
-        await getTrainerImg(myInfo.profileImgUrl);
+        await getMyTrainerImg(myInfo.profileImgUrl);
       }
     }
     if (loginAuth.id != 0 && loginAuth.loginType == LoginType.USER.value) {

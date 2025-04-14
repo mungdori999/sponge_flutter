@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:sponge_app/component/answer/answer_like_button.dart';
 import 'package:sponge_app/const/color_const.dart';
@@ -9,12 +10,13 @@ import 'package:sponge_app/data/post/post.dart';
 import 'package:sponge_app/data/user/user_auth.dart';
 import 'package:sponge_app/request/answer_reqeust.dart';
 import 'package:sponge_app/request/chat_room_request.dart';
+import 'package:sponge_app/request/trainer_img_reqeust.dart';
 import 'package:sponge_app/screen/answer/update_answer.dart';
 import 'package:sponge_app/screen/post_screen.dart';
 import 'package:sponge_app/screen/trainer/trainer_individual_profile.dart';
 import 'package:sponge_app/util/convert.dart';
 
-class AnswerDetails extends StatelessWidget {
+class AnswerDetails extends StatefulWidget {
   final AnswerDetailsListResponse answer;
   final LoginAuth loginAuth;
   final VoidCallback deleteButton;
@@ -28,6 +30,29 @@ class AnswerDetails extends StatelessWidget {
       required this.post});
 
   @override
+  State<AnswerDetails> createState() => _AnswerDetailsState();
+}
+
+class _AnswerDetailsState extends State<AnswerDetails> {
+  bool isLoading = true;
+  Uint8List? imageBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _getImageFile();
+  }
+
+  void _getImageFile() async {
+    if (widget.post.pet.petImgUrl != "")
+      imageBytes = await getOtherTrainerImg(
+          widget.answer.trainerShortResponse.profileImgUrl);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -37,7 +62,7 @@ class AnswerDetails extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: answer.checkAdopt ? lightYellow : lightGrey,
+              color: widget.answer.checkAdopt ? lightYellow : lightGrey,
               borderRadius: BorderRadius.all(
                 Radius.circular(14),
               ),
@@ -52,39 +77,53 @@ class AnswerDetails extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => TrainerIndividualProfile(
-                            id: answer.trainerShortResponse.id,
-                            loginAuth: loginAuth,
+                            id: widget.answer.trainerShortResponse.id,
+                            loginAuth: widget.loginAuth,
                           ),
                         ),
                       );
                     },
                     child: Row(
                       children: [
-                        Container(
-                          width: 44, // 이미지의 너비
-                          height: 44, // 이미지의 높이
-                          child: ClipOval(
-                            child: answer.trainerShortResponse.profileImgUrl ==
-                                    ''
-                                ? Container(
-                                    width: 70, // 동그라미의 너비
-                                    height: 70, // 동그라미의 높이
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300], // 회색 배경색
-                                      shape: BoxShape.circle, // 동그라미 형태
-                                    ),
-                                    child: Icon(
-                                      Icons.person, // 사람 모양 아이콘
-                                      color: Colors.white, // 아이콘 색상
-                                      size: 30, // 아이콘 크기
-                                    ),
-                                  )
-                                : Image.network(
-                                    answer.trainerShortResponse.profileImgUrl,
-                                    fit: BoxFit.cover, // 이미지 크기 조정
-                                  ),
+                        if (!isLoading) ...[
+                          ClipOval(
+                            child: Container(
+                              width: 44, // 동그라미의 너비
+                              height: 44, // 동그라미의 높이
+                              decoration: BoxDecoration(
+                                color: Colors.white, // 회색 배경색
+                                shape: BoxShape.circle,
+                                image: imageBytes != null
+                                    ? DecorationImage(
+                                        image: MemoryImage(imageBytes!),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null, // 동그라미 형태
+                              ),
+                              child: imageBytes == null
+                                  ? Icon(
+                                      Icons.person,
+                                      color: mainGrey,
+                                      size: 30,
+                                    )
+                                  : null,
+                            ),
                           ),
-                        ),
+                        ] else ...[
+                          ClipOval(
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              color: lightGrey,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: mainGrey, // 로딩바 색상
+                                  strokeWidth: 3.0, // 로딩바 두께
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                         SizedBox(
                           width: 8,
                         ),
@@ -92,14 +131,14 @@ class AnswerDetails extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${answer.trainerShortResponse.name} 훈련사님',
+                              '${widget.answer.trainerShortResponse.name} 훈련사님',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w700),
                             ),
                             Row(
                               children: [
                                 Text(
-                                  '채택된 답변 ${answer.trainerShortResponse.adoptCount}건',
+                                  '채택된 답변 ${widget.answer.trainerShortResponse.adoptCount}건',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: mediumGrey,
@@ -117,7 +156,7 @@ class AnswerDetails extends StatelessWidget {
                                   width: 8,
                                 ),
                                 Text(
-                                  '1:1상담 ${answer.trainerShortResponse.chatCount}회',
+                                  '1:1상담 ${widget.answer.trainerShortResponse.chatCount}회',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: mediumGrey,
@@ -133,12 +172,12 @@ class AnswerDetails extends StatelessWidget {
                   SizedBox(
                     height: 4,
                   ),
-                  if (loginAuth.loginType == LoginType.USER.value &&
-                      loginAuth.id == post.userId)
+                  if (widget.loginAuth.loginType == LoginType.USER.value &&
+                      widget.loginAuth.id == widget.post.userId)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (!answer.checkAdopt)
+                        if (!widget.answer.checkAdopt)
                           SizedBox(
                             width: MediaQuery.of(context).size.width / 2.5,
                             child: ElevatedButton(
@@ -232,16 +271,18 @@ class AnswerDetails extends StatelessWidget {
                                                     horizontal: 16),
                                                 child: OutlinedButton(
                                                   onPressed: () async {
-                                                    AdoptAnswerCreate
-                                                        adoptAnswerCreate =
+                                                    AdoptAnswerCreate adoptAnswerCreate =
                                                         new AdoptAnswerCreate(
-                                                            answerId: answer
+                                                            answerId: widget
+                                                                .answer
                                                                 .answerResponse
                                                                 .id,
-                                                            trainerId: answer
+                                                            trainerId: widget
+                                                                .answer
                                                                 .trainerShortResponse
                                                                 .id,
-                                                            postId: answer
+                                                            postId: widget
+                                                                .answer
                                                                 .answerResponse
                                                                 .postId);
                                                     await createAdoptAnswer(
@@ -259,7 +300,8 @@ class AnswerDetails extends StatelessWidget {
                                                       MaterialPageRoute(
                                                         builder: (context) =>
                                                             PostScreen(
-                                                                id: answer
+                                                                id: widget
+                                                                    .answer
                                                                     .answerResponse
                                                                     .postId),
                                                       ),
@@ -317,16 +359,17 @@ class AnswerDetails extends StatelessWidget {
                             ),
                           ),
                         SizedBox(
-                          width: answer.checkAdopt
+                          width: widget.answer.checkAdopt
                               ? MediaQuery.of(context).size.width / 1.2
                               : MediaQuery.of(context).size.width / 2.5,
                           child: ElevatedButton(
                             onPressed: () async {
                               createChatRoom(new ChatRoomCreate(
-                                  trainerId: answer.trainerShortResponse.id));
+                                  trainerId:
+                                      widget.answer.trainerShortResponse.id));
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: answer.checkAdopt
+                              backgroundColor: widget.answer.checkAdopt
                                   ? mainYellow
                                   : buttonGrey, // 배경색 설정
                               shape: RoundedRectangleBorder(
@@ -353,7 +396,7 @@ class AnswerDetails extends StatelessWidget {
           SizedBox(
             height: 8,
           ),
-          if (answer.checkAdopt) ...[
+          if (widget.answer.checkAdopt) ...[
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -374,7 +417,7 @@ class AnswerDetails extends StatelessWidget {
             ),
           ],
           Text(
-            answer.answerResponse.content,
+            widget.answer.answerResponse.content,
             style: TextStyle(
               color: darkGrey,
               fontSize: 16,
@@ -387,22 +430,24 @@ class AnswerDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               AnswerLikeButton(
-                answerId: answer.answerResponse.id,
-                loginType: loginAuth.loginType,
-                likeCount: answer.answerResponse.likeCount,
-                flag: answer.answerCheckResponse.likeCheck,
+                answerId: widget.answer.answerResponse.id,
+                loginType: widget.loginAuth.loginType,
+                likeCount: widget.answer.answerResponse.likeCount,
+                flag: widget.answer.answerCheckResponse.likeCheck,
               ),
               Row(
                 children: [
                   Text(
-                    Convert.convertTimeAgo(answer.answerResponse.createdAt),
+                    Convert.convertTimeAgo(
+                        widget.answer.answerResponse.createdAt),
                     style: TextStyle(
                       fontSize: 12,
                       color: mainGrey,
                     ),
                   ),
-                  if (loginAuth.loginType == LoginType.TRAINER.value &&
-                      loginAuth.id == answer.trainerShortResponse.id)
+                  if (widget.loginAuth.loginType == LoginType.TRAINER.value &&
+                      widget.loginAuth.id ==
+                          widget.answer.trainerShortResponse.id)
                     PopupMenuButton(
                       color: Colors.white,
                       onSelected: (value) {
@@ -411,8 +456,8 @@ class AnswerDetails extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => UpdateAnswer(
-                                post: post,
-                                answer: answer,
+                                post: widget.post,
+                                answer: widget.answer,
                               ),
                             ),
                           );
@@ -438,7 +483,7 @@ class AnswerDetails extends StatelessWidget {
                                       SizedBox(
                                         width: 120,
                                         child: ElevatedButton(
-                                          onPressed: deleteButton,
+                                          onPressed: widget.deleteButton,
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: mainYellow,
                                             // 배경색 설정

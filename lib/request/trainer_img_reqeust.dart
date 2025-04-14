@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:sponge_app/http/auth_dio.dart';
@@ -6,7 +7,7 @@ import 'package:sponge_app/http/status_code.dart';
 import 'package:sponge_app/http/url.dart';
 import 'package:sponge_app/request/image_request.dart';
 
-Future<void> getTrainerImg(String imgUrl) async {
+Future<void> getMyTrainerImg(String imgUrl) async {
   var _dio = await authDio();
   final url = Uri(
     scheme: scheme,
@@ -24,6 +25,32 @@ Future<void> getTrainerImg(String imgUrl) async {
     await downloadProfileImage(response.data.toString());
     // 응답 코드가 200번대일 때 처리
     if (response.statusCode == ok) {
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<Uint8List?> getOtherTrainerImg(String imgUrl) async {
+  var _dio = await authDio();
+  final url = Uri(
+    scheme: scheme,
+    host: host,
+    port: port,
+    path: '${path}/trainer/image',
+    queryParameters: {
+      'imgUrl': imgUrl,
+    },
+  ).toString();
+
+  try {
+    final response = await _dio.get(url);
+
+    // 응답 코드가 200번대일 때 처리
+    if (response.statusCode == ok) {
+      return await getProfileImage(response.data.toString());
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }

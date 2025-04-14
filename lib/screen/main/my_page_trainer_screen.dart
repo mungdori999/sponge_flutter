@@ -46,7 +46,7 @@ class _MyPageTrainerScreenState extends State<MyPageTrainerScreen> {
   Future<void> _initializeData() async {
     final myInfo = await getMyTrainerInfo();
     if (myInfo.profileImgUrl != "") {
-      await getTrainerImg(myInfo.profileImgUrl);
+      await getMyTrainerImg(myInfo.profileImgUrl);
 
     }
     setState(() {
