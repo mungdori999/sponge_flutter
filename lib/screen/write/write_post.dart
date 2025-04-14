@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sponge_app/component/top/write_top.dart';
@@ -16,6 +18,7 @@ import 'package:sponge_app/screen/write/select_pet.dart';
 import 'package:sponge_app/screen/write/write_modal.dart';
 import 'package:sponge_app/util/file_storage.dart';
 import 'package:sponge_app/util/page_index_provider.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class WritePost extends StatefulWidget {
   final Pet pet;
@@ -44,6 +47,8 @@ class _WritePostState extends State<WritePost> {
   bool isLoading = true;
   File? petImage = null;
 
+  List<MediaFile> selectedMedia = [];
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +76,41 @@ class _WritePostState extends State<WritePost> {
       imageCache.clearLiveImages();
       isLoading = false;
     });
+  }
+
+  Future<void> _pickFiles() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.media,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      List<MediaFile> tempList = [];
+
+      for (var file in result.files) {
+        final path = file.path!;
+        final isVideo = file.extension?.toLowerCase().contains('mp4') ?? false;
+
+        Uint8List? thumbnail;
+        if (isVideo) {
+          thumbnail = await VideoThumbnail.thumbnailData(
+            video: path,
+            imageFormat: ImageFormat.PNG,
+            maxWidth: 100,
+            quality: 25,
+          );
+        } else {
+          thumbnail = await File(path).readAsBytes();
+        }
+
+        tempList.add(MediaFile(
+            file: File(path), isVideo: isVideo, thumbnail: thumbnail));
+      }
+
+      setState(() {
+        selectedMedia.addAll(tempList);
+      });
+    }
   }
 
   @override
@@ -288,17 +328,17 @@ class _WritePostState extends State<WritePost> {
                             shape: BoxShape.circle,
                             image: petImage != null
                                 ? DecorationImage(
-                              image: FileImage(petImage!),
-                              fit: BoxFit.cover,
-                            )
+                                    image: FileImage(petImage!),
+                                    fit: BoxFit.cover,
+                                  )
                                 : null, // 동그라미 형태
                           ),
                           child: petImage == null
                               ? Icon(
-                            Icons.pets,
-                            color: mainGrey,
-                            size: 20,
-                          )
+                                  Icons.pets,
+                                  color: mainGrey,
+                                  size: 20,
+                                )
                               : null,
                         ),
                       ),
@@ -479,44 +519,95 @@ class _WritePostState extends State<WritePost> {
                   height: 8,
                 ),
                 GestureDetector(
-                  onTap: (){},
+                  onTap: _pickFiles,
                   child: DottedBorder(
-                    color: mainGrey,
+                    color: Colors.grey,
                     strokeWidth: 1,
                     dashPattern: [6, 3],
                     borderType: BorderType.RRect,
                     radius: Radius.circular(12),
                     child: Container(
                       width: double.infinity,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 30),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 25,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                color: checkGrey,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 25 * 0.6, // 아이콘 크기 비율
+                      height: 150,
+                      padding: EdgeInsets.all(10),
+                      child: selectedMedia.isEmpty
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 25,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Icon(Icons.add,
+                                        color: Colors.white, size: 15),
+                                  ),
                                 ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '사진이나 동영상을 첨부해주세요',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 16),
+                                ),
+                              ],
+                            )
+                          : SizedBox(
+                              height: 100,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: selectedMedia.length,
+                                separatorBuilder: (_, __) => SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+
+                                  final media = selectedMedia[index];
+                                  return Stack(
+                                    children: [
+                                      Image.memory(
+                                        media.thumbnail!,
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        left: 4,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedMedia.removeAt(index);
+                                            });
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            padding: EdgeInsets.all(4),
+                                            child: Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (media.isVideo)
+                                        Align(
+                                          alignment: Alignment.center,
+                                          child: Icon(
+                                            Icons.videocam,
+                                            color: Colors.white,
+                                            size: 30,  // 크기 조정
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
-                            Text(
-                              '사진이나 동영상을 첨부해주세요',
-                              style: TextStyle(
-                                color: mainGrey,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -632,4 +723,13 @@ class _CustomTextFiled extends StatelessWidget {
       ),
     );
   }
+}
+
+class MediaFile {
+  final File file;
+  final bool isVideo;
+  final Uint8List? thumbnail;
+
+  MediaFile(
+      {required this.file, required this.isVideo, required this.thumbnail});
 }

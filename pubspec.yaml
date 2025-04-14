@@ -46,7 +46,8 @@ dependencies:
   stomp_dart_client: ^0.4.4
   intl: ^0.18.1
   image_picker: ^1.0.7
-  video_player: ^2.7.0
+  file_picker: ^6.1.1
+  video_thumbnail: ^0.5.3
   path_provider: ^2.1.2
 
 dev_dependencies:
